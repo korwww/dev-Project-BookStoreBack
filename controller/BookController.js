@@ -5,20 +5,41 @@ dotenv.config();
 
 const bookfunctions = {
     selectAllBooks: (req, res) => {
-        res.status(200).json('전체 도서 조회');
+        let sql = `SELECT id, title, summary, author, price, pub_date FROM books`;
+
+        conn.query(sql, (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+    
+                return res.status(StatusCodes.OK).json(results);
+            }
+        );
     },
     
     selectCategoryBooks: (req, res) => {
         const categoryId = req.query.categoryId;
         const isNew = req.query.new;
 
-        res.json('카테고리별 도서 목록 조회');
     },
 
     selectSingleBook: (req, res) => {
-        const bookId = req.params.booksId;
+        let booksId = req.params.booksId;
         
-        res.json('개별 도서 조회');
+        let sql = `SELECT id, title, summary, author, price, pub_date FROM books WHERE id = ?`;
+
+        conn.query(sql, booksId, 
+            (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+                
+                if(results[0]) return res.status(StatusCodes.OK).json(results[0]);
+                else return res.status(StatusCodes.NOT_FOUND).end();
+            }
+        );
     },
 };
 
