@@ -18,4 +18,21 @@ const join = (req, res) => {
     );
 }
 
-module.exports = join;
+const login = (req, res)=>{
+    res.json('로그인');
+};
+
+const passwordResetRequest =  (req, res)=>{
+    res.json('비밀번호 초기화 요청');
+};
+
+const passwordReset = (req, res) => {
+    res.json('비밀번호 초기화');
+};
+
+module.exports = {
+    join,
+    login,
+    passwordResetRequest,
+    passwordReset
+};
