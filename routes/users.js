@@ -3,7 +3,7 @@ const router = express.Router();
 const conn = require('../mariadb');
 const {StatusCodes} = require('http-status-codes');
 const { body, param, validationResult } = require('express-validator');
-const {join, login , passwordResetRequest, passwordReset} = require('../controller/UserContorller');
+const {join, login , passwordResetRequest, passwordReset} = require('../controller/UserController');
 
 const jwt = require('jsonwebtoken');
 
