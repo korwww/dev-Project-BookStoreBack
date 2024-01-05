@@ -31,9 +31,9 @@ CREATE TABLE `BookShop`.`books` (
 -- category 테이블
 CREATE TABLE `BookShop`.`category` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
+  `category_name` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id`));
-
+  
 -- 왜래키 설정
 ALTER TABLE `BookShop`.`books` 
 ADD INDEX `category_id_idx` (`category_id` ASC) VISIBLE;
@@ -56,3 +56,8 @@ INSERT INTO `BookShop`.`books` (`title`, `img`, `category_id`, `form`, `isbn`, `
 INSERT INTO `BookShop`.`category` (`id`, `name`) VALUES ('0', '동화');
 INSERT INTO `BookShop`.`category` (`id`, `name`) VALUES ('1', '소설');
 INSERT INTO `BookShop`.`category` (`id`, `name`) VALUES ('2', '사회');
+
+select *
+from books
+left join category on books.category_id = category.id
+where books.id=5;
