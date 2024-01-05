@@ -26,10 +26,14 @@ router.post('/join',
         body('email').notEmpty().isString().isEmail().withMessage('이메일 확인 필요!'),
         body('password').notEmpty().isString().withMessage('비밀번호 확인 필요!'),
         validate
-    ],
-    join);
+    ], join);
 
-router.post('/login', login);
+router.post('/login'
+    [
+        body('email').notEmpty().isString().isEmail().withMessage('이메일 확인 필요!'),
+        body('password').notEmpty().isString().withMessage('비밀번호 확인 필요!'),
+        validate
+    ], login);
 
 router.post('/reset', passwordResetRequest);
 
