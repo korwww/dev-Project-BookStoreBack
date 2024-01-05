@@ -6,7 +6,7 @@ dotenv.config();
 
 app.listen(process.env.PORT,
     ()=>{console.log("server start!")}
-    );
+);
 
 const routes = [
   { path: '/users', file: './routes/users' },

@@ -28,14 +28,19 @@ router.post('/join',
         validate
     ], join);
 
-router.post('/login'
+router.post('/login',
     [
         body('email').notEmpty().isString().isEmail().withMessage('이메일 확인 필요!'),
         body('password').notEmpty().isString().withMessage('비밀번호 확인 필요!'),
         validate
     ], login);
 
-router.post('/reset', passwordResetRequest);
+router.post('/reset',
+    [
+        body('email').notEmpty().isString().isEmail().withMessage('이메일 확인 필요!'),
+        body('password').notEmpty().isString().withMessage('비밀번호 확인 필요!'),
+        validate
+    ], passwordResetRequest);
 
 router.put('/reset', passwordReset);
 
