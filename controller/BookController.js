@@ -4,6 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 const bookController = {
     selectBooksByCategory: (req, res) => {
         const { categoryId, isNew } = req.query;
+        
         let sql = `SELECT * FROM books`;
         let values = [];
         let conditions = [];
@@ -12,14 +13,12 @@ const bookController = {
             conditions.push(`category_id = ?`);
             values.push(categoryId);
         }
-        if (isNew) {
+        if (isNew && isNew.toLowerCase() !== "false") {
             conditions.push(`pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`);
-            values.push(isNew);
         }
         if (conditions.length > 0) {
             sql += ` WHERE ` + conditions.join(` AND `);
         }
-
         conn.query(sql, values,
             (err, results) => {
                 if (err) {
