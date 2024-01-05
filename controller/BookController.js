@@ -2,25 +2,11 @@ const conn = require('../mariadb');
 const { StatusCodes } = require('http-status-codes');
 
 const bookController = {
-    selectAllBooks: (req, res) => {
-        let sql = `SELECT id, title, summary, author, price, pub_date FROM books`;
-
-        conn.query(sql, (err, results) => {
-            if (err) {
-                console.log(err);
-                return res.status(StatusCodes.BAD_REQUEST).end();
-            }
-
-            return res.status(StatusCodes.OK).json(results);
-        }
-        );
-    },
-
-    selectBooksByCategory: (req, res, next) => {
+    selectBooksByCategory: (req, res) => {
         const { categoryId, isNew } = req.query;
-        if (!categoryId) return next();
-
-        let sql = `SELECT id, title, summary, author, price, pub_date FROM books WHERE category_id = ?`;
+        let sql =`SELECT * FROM books`;
+        if (categoryId) sql += `WHERE category_id = ?`
+        if (isNew) sql += `AND pub_date BETWEEN DATE_SUB(NOW(),INTERVAL -1 MONTH ) AND NOW()`;
 
         conn.query(sql, categoryId,
             (err, results) => {
