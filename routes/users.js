@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
+const {StatusCodes} = require('http-status-codes');
 const { body, param, validationResult } = require('express-validator');
 
 const jwt = require('jsonwebtoken');
@@ -34,7 +35,7 @@ router.post('/join',
             function (err, results) {
                 if (err) {
                     console.log(err);
-                    return res.status(400).end();
+                    return res.status(StatusCodes.BAD_REQUEST).end();
                 }
 
                 res.status(201).json(results);
