@@ -3,8 +3,10 @@ const { StatusCodes } = require('http-status-codes');
 
 const bookController = {
     selectBooksByCategory: (req, res) => {
-        const { categoryId, isNew } = req.query;
-        
+        const { categoryId, isNew, limit, currentPage } = req.query;
+
+        let offset = limit * (currentPage-1);
+
         let sql = `SELECT * FROM books`;
         let values = [];
         let conditions = [];
@@ -13,12 +15,16 @@ const bookController = {
             conditions.push(`category_id = ?`);
             values.push(categoryId);
         }
-        if (isNew && isNew.toLowerCase() !== "false") {
+        if (String(isNew).toLowerCase() === "true") {
             conditions.push(`pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`);
         }
         if (conditions.length > 0) {
             sql += ` WHERE ` + conditions.join(` AND `);
         }
+        sql += ` LIMIT ? OFFSET ?`;
+        values.push(parseInt(limit), offset);
+
+        console.log(require('mysql2').format(sql, values));
         conn.query(sql, values,
             (err, results) => {
                 if (err) {
