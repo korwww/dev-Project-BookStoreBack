@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
-const {selectAllBooks, selectCategoryBooks, selectSingleBook} = require('../controller/BookController');
+const {selectAllBooks, selectBooksByCategory, selectSingleBook} = require('../controller/BookController');
 
 
 const dotenv = require('dotenv');
@@ -21,8 +21,8 @@ const validate = (req, res, next) => {
 
 router.
 route('/')
-    .get(selectAllBooks)
-    .get(selectCategoryBooks);
+    .get(selectBooksByCategory)
+    .get(selectAllBooks);
 
 router.get('/:booksId', selectSingleBook);
 
