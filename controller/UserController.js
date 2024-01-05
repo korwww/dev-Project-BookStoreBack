@@ -108,9 +108,9 @@ const passwordReset = (req, res) => {
     );
 };
 
-module.exports = {
+module.exports = Object.freeze({
     join,
     login,
     passwordResetRequest,
     passwordReset
-};
+});

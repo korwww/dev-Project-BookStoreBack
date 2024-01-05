@@ -9,14 +9,15 @@ app.listen(process.env.PORT,
 );
 
 const routes = [
-  { path: '/users', file: './routes/users' },
-  { path: '/books', file: './routes/books' },
-  { path: '/likes', file: './routes/likes' },
-  { path: '/carts', file: './routes/carts' },
-  { path: '/orders', file: './routes/orders'}
+  { path: '/users', routes: './routes/users' },
+  { path: '/books', routes: './routes/books' },
+  { path: '/likes', routes: './routes/likes' },
+  { path: '/carts', routes: './routes/carts' },
+  { path: '/orders', routes: './routes/orders'},
+  { path: '/category', routes: './routes/category'}
 ];
 
 routes.forEach(route => {
-  const router = require(route.file);
+  const router = require(route.routes);
   app.use(route.path, router);
 });

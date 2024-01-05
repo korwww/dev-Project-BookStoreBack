@@ -1,9 +1,7 @@
 const conn = require('../mariadb');
-const dotenv = require('dotenv');
 const {StatusCodes} = require('http-status-codes');
-dotenv.config();
 
-const bookfunctions = {
+const bookController = {
     selectAllBooks: (req, res) => {
         let sql = `SELECT id, title, summary, author, price, pub_date FROM books`;
 
@@ -54,6 +52,6 @@ const bookfunctions = {
             }
         );
     },
-};
+}
 
-module.exports = bookfunctions;
+module.exports = Object.freeze(bookController);
