@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-//const conn = require('../mariadb');
+const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
 
 const jwt = require('jsonwebtoken');
@@ -26,20 +26,20 @@ router.post('/join',
         validate
     ],
     (req, res) => {
-        // const { email, name } = req.body;
+        const { email, name } = req.body;
 
-        // let sql = `INSERT INTO users (email, name) VALUES(?,?)`;
-        // let values = [email, name];
-        // conn.query(sql, values,
-        //     function (err, results) {
-        //         if (err) {
-        //             console.log(err);
-        //             return res.status(400).end();
-        //         }
+        let sql = `INSERT INTO users (email, name) VALUES(?, ?)`;
+        let values = [email, name];
+        conn.query(sql, values,
+            function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return res.status(400).end();
+                }
 
-        //         res.status(201).json(results);
-        //     }
-        // );
+                res.status(201).json(results);
+            }
+        );
         res.json('회원가입');
     });
 

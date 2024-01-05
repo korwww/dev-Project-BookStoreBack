@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-//const conn = require('../mariadb');
+const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
 
 const jwt = require('jsonwebtoken');
