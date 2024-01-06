@@ -7,7 +7,7 @@ const bookController = {
 
         let offset = limit * (currentPage-1);
 
-        let sql = `SELECT * FROM books`;
+        let sql = `SELECT *, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes FROM books`;
         let values = [];
         let conditions = [];
         
