@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
+const {addLike, removeLike} = require('../controller/LikeController');
 
 const jwt = require('jsonwebtoken');
 
@@ -21,15 +22,7 @@ const validate = (req, res, next) => {
 
 router
     .route('/:booksId')
-    .all((req, res, next) => {
-        req.booksId = req.params.booksId;
-        next();
-    })
-    .post((req, res) => {
-        res.status(200).json('좋아요 추가');
-    })
-    .delete((req, res) => {
-        res.status(200).json('좋아요 삭제');
-    });
+    .post(addLike)
+    .delete(removeLike);
 
 module.exports = router;

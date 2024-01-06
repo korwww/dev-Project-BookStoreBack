@@ -56,7 +56,7 @@ const bookController = {
                 else return res.status(StatusCodes.NOT_FOUND).end();
             }
         );
-    },
+    }
 }
 
 module.exports = Object.freeze(bookController);
