@@ -17,7 +17,18 @@ const likeController = {
         );
     },
     removeLike: (req, res) => {
-        res.status(200).json('좋아요 삭제');
+        let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
+        let values = [1, req.params.booksId];
+        conn.query(sql, values,
+            function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+
+                return res.status(StatusCodes.CREATED).json(results);
+            }
+        );
     }
 }
 

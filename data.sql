@@ -94,3 +94,4 @@ left join category on books.category_id = category.id
 where books.id=5;
 
 INSERT INTO likes(user_id, liked_book_id) VALUES (1, 1);
+DELETE FROM likes WHERE user_id = 1 AND liked_book_id = 3;
