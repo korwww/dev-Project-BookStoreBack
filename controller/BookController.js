@@ -39,13 +39,19 @@ const bookController = {
     },
 
     selectSingleBook: (req, res) => {
+        let {user_id} = req.body;
         let booksId = req.params.booksId;
 
-        let sql = `select * from books
-                   left join category on books.category_id = category.id
-                   where books.id=?;`;
+        let sql = `SELECT *, 
+                    (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes,
+                    (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked
+                    FROM books
+                    LEFT JOIN category
+                    ON books.category_id = category.category_id
+                    WHERE books.id=?;`;
+        let values = [user_id, booksId, booksId]        
 
-        conn.query(sql, booksId,
+        conn.query(sql, values,
             (err, results) => {
                 if (err) {
                     console.log(err);

@@ -19,9 +19,7 @@ const validate = (req, res, next) => {
     }
 }
 
-router.
-route('/')
-    .get(selectBooksByCategory)
+router.get('/', selectBooksByCategory)
 
 router.get('/:booksId', selectSingleBook);
 
