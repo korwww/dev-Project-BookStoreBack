@@ -24,11 +24,10 @@ router
     .post(getCartItems);
 
     
-router.delete('/:bookId', (req, res)=>{
-    const bookId = req.params.bookId;
-    res.status(200).json('장바구니 조회');
-});
+router.delete('/:bookId', removeCartItems);
 
-router.get('/:bookId', removeCartItems);
+router.get('/:bookId', (res)=>{
+    console.log('장바구니에서 선택한 주문 예상 상품 목록 조회');
+});
 
 module.exports = router;
