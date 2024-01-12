@@ -18,21 +18,21 @@ const cartController = {
         );
     },
     getCartItems: (req, res) => {
-        let sql = `SELECT c.id AS cartId, b.id, book_id, title, summary, quantity, price
-                    FROM books b
-                    JOIN cartItems c
-                    ON c.book_id=b.id;`;
+        const { user_id } = req.body;
+        let sql = `SELECT c.id, book_id, title, summary, quantity, price
+                    FROM cartItems c LEFT JOIN books b
+                    ON c.book_id=b.id
+                    WHERE user_id;`;
         let values = [user_id, booksId, booksId]
 
-        conn.query(sql, values,
+        conn.query(sql, user_id,
             (err, results) => {
                 if (err) {
                     console.log(err);
                     return res.status(StatusCodes.BAD_REQUEST).end();
                 }
 
-                if (results[0]) return res.status(StatusCodes.OK).json(results[0]);
-                else return res.status(StatusCodes.NOT_FOUND).end();
+                return res.status(StatusCodes.OK).json(results[0]);
             }
         );
     },
