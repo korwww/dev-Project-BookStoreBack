@@ -3,13 +3,36 @@ const { StatusCodes } = require('http-status-codes');
 
 const cartController = {
     addItemsToCart : (req, res) => {
-        res.status(201).json('장바구니 담기');
+        const {book_id, quantity, user_id} = req.body;
+        let sql = `INSERT INTO cartItems (book_id, quantity, user_id) VALUES (?, ?, ?);`;
+        let values = [book_id, quantity, user_id];
+        conn.query(sql, values,
+            function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+
+                return res.status(StatusCodes.CREATED).json(results);
+            }
+        );
     },
     getCartItems : (req, res) => {
         res.status(200).json('장바구니 조회');
     },
     removeCartItems : (req, res)=>{
-        res.status(200).json('장바구니에서 선택한 상품 목록 조회');
+        let sql = `DELETE FROM cartItems WHERE user_id = ? AND liked_book_id = ?;`;
+        let values = [1, req.params.booksId];
+        conn.query(sql, values,
+            function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+
+                return res.status(StatusCodes.CREATED).json(results);
+            }
+        );
     }
 }
 

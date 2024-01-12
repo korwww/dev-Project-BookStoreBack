@@ -20,8 +20,8 @@ const validate = (req, res, next) => {
 
 router
     .route('/')
-    .get(addItemsToCart)
-    .post(getCartItems);
+    .get(getCartItems)
+    .post(addItemsToCart);
 
     
 router.delete('/:bookId', removeCartItems);
