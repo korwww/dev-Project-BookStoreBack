@@ -22,7 +22,6 @@ router
     .route('/')
     .get(getCartItems)
     .post(addItemsToCart)
-    .get("주문 예상 상품 목록 조회");
 
 router.delete('/:id', removeCartItems);
 

@@ -18,21 +18,20 @@ const cartController = {
         );
     },
     getCartItems: (req, res) => {
-        const { user_id } = req.body;
+        const { user_id, selected } = req.body;
         let sql = `SELECT c.id, book_id, title, summary, quantity, price
                     FROM cartItems c LEFT JOIN books b
                     ON c.book_id=b.id
-                    WHERE user_id;`;
-        let values = [user_id, booksId, booksId]
+                    WHERE user_id = ? AND c.id IN (?);`;
 
-        conn.query(sql, user_id,
+        conn.query(sql, [user_id, selected],
             (err, results) => {
                 if (err) {
                     console.log(err);
                     return res.status(StatusCodes.BAD_REQUEST).end();
                 }
 
-                return res.status(StatusCodes.OK).json(results[0]);
+                return res.status(StatusCodes.OK).json(results);
             }
         );
     },
@@ -49,22 +48,6 @@ const cartController = {
                 return res.status(StatusCodes.OK).json(results);
             }
         );
-    },
-    getOrderItems: (req, res)=>{
-        const cartItemsIds = req.body;
-        let sql = `DELETE FROM cartItems WHERE id = ?;`;
-        let values = 0;
-        conn.query(sql, values,
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.OK).json(results);
-            }
-        );
-        console.log('장바구니에서 선택한 주문 예상 상품 목록 조회');
     }
 }
 
