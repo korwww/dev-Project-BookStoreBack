@@ -118,3 +118,8 @@ ON c.book_id=b.id;
 
 -- 장바구니 아이템 조회
 DELETE FROM cartItems WHERE id = ?;
+
+-- 장바구니에서 선택한(장바구니 도서 id) 아이템 목록 조회
+SELECT * FROM BookShop.cartItems
+WHERE user_id = 1
+AND id IN(1,3);

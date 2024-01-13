@@ -37,8 +37,8 @@ const cartController = {
         );
     },
     removeCartItems: (req, res) => {
-        const {bookId} = req.params;
-        let sql = `DELETE FROM cartItems WHERE book_id = ?;`;
+        const {id} = req.params;
+        let sql = `DELETE FROM cartItems WHERE id = ?;`;
         conn.query(sql, bookId,
             function (err, results) {
                 if (err) {
@@ -46,9 +46,25 @@ const cartController = {
                     return res.status(StatusCodes.BAD_REQUEST).end();
                 }
 
-                return res.status(StatusCodes.CREATED).json(results);
+                return res.status(StatusCodes.OK).json(results);
             }
         );
+    },
+    getOrderItems: (req, res)=>{
+        const cartItemsIds = req.body;
+        let sql = `DELETE FROM cartItems WHERE id = ?;`;
+        let values = 0;
+        conn.query(sql, values,
+            function (err, results) {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+
+                return res.status(StatusCodes.OK).json(results);
+            }
+        );
+        console.log('장바구니에서 선택한 주문 예상 상품 목록 조회');
     }
 }
 
