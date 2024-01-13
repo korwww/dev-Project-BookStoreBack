@@ -37,8 +37,8 @@ const cartController = {
         );
     },
     removeCartItems: (req, res) => {
-        let sql = `DELETE FROM cartItems WHERE user_id = ? AND liked_book_id = ?;`;
-        let values = [1, req.params.booksId];
+        let sql = `DELETE FROM cartItems WHERE user_id = ?;`;
+        let values = [req.params.userId];
         conn.query(sql, values,
             function (err, results) {
                 if (err) {

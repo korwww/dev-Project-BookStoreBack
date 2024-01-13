@@ -24,7 +24,7 @@ router
     .post(addItemsToCart);
 
     
-router.delete('/:bookId', removeCartItems);
+router.delete('/:userId', removeCartItems);
 
 router.get('/:bookId', (res)=>{
     console.log('장바구니에서 선택한 주문 예상 상품 목록 조회');

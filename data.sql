@@ -111,7 +111,10 @@ INSERT INTO cartItems (book_id, quantity, user_id) VALUES (2, 1, 1);
 INSERT INTO cartItems (book_id, quantity, user_id) VALUES (1, 1, 2);
 INSERT INTO cartItems (book_id, quantity, user_id) VALUES (2, 1, 2);
 
--- 장바구니 조회
+-- 장바구니 아이템 목록 조회
 SELECT c.id, book_id, title, summary, quantity, price
 FROM cartItems c LEFT JOIN books b
 ON c.book_id=b.id;
+
+-- 장바구니 아이템 조회
+DELETE FROM cartItems WHERE id = ?;
