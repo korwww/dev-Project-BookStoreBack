@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
-
-const jwt = require('jsonwebtoken');
+const {addItemsToCart, getCartItems, removeCartItems} = require('../controller/CartController');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -21,21 +20,9 @@ const validate = (req, res, next) => {
 
 router
     .route('/')
-    .get((req, res) => {
-        res.status(200).json('장바구니 조회');
-    })
-    .post((req, res) => {
-        res.status(201).json('장바구니 담기');
-    });
+    .get(getCartItems)
+    .post(addItemsToCart)
 
-    
-router.delete('/:bookId', (req, res)=>{
-    const bookId = req.params.bookId;
-    res.status(200).json('장바구니 조회');
-});
-
-// router.get('/:bookId', (req, res)=>{
-//     res.status(200).json('장바구니에서 선택한 상품 목록 조회');
-// });
+router.delete('/:id', removeCartItems);
 
 module.exports = router;
