@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
 const { body, param, validationResult } = require('express-validator');
+const {getOrders, order , getOrderDetail} = require('../controller/OrderController');
 
 const jwt = require('jsonwebtoken');
 
@@ -21,16 +22,9 @@ const validate = (req, res, next) => {
 
 router
     .route('/')
-    .get((req, res) => {
-        res.status(200).json('주문 목록 조회');
-    })
-    .post((req, res) => {
-        res.status(200).json('주문 하기');
-    });
+    .get(getOrders)
+    .post(order);
 
-router.get('/:orderId', (req, res)=>{
-    const orderId = req.params.orderId;
-    res.status(200).json('주문 상세 상품 조회');
-});
+router.get('/:orderId', getOrderDetail);
 
 module.exports = router;
