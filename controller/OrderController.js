@@ -64,9 +64,21 @@ const orderController = {
         let [rows, fields] = await conn.query(sql);
         return res.statuscodes(StatusCodes.OK).json(rows);
     },
-    getOrderDetail: (req, res) => {
-        const orderId = req.params.orderId;
-        res.status(200).json('주문 상세 상품 조회');
+    getOrderDetail: async (req, res) => {
+        const {orderId} = req.params;
+        const conn = await mariadb.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'root',
+            database: 'BookShop',
+            dateStrings: true
+        });
+        let sql = `select book_id, title, author, price, quantity
+                    from BookShop.orderedBook LEFT JOIN BookShop.books
+                    on orderedBook.book_id = books.id
+                    WHERE order_id = ?;`
+        let [rows, fields] = await conn.query(sql, [orderId]);
+        return res.statuscodes(StatusCodes.OK).json(rows);
     }
 }
 
