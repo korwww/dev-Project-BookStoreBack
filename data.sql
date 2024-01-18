@@ -118,3 +118,23 @@ INSERT INTO orderedBook(order_id, book_id, quantity)
 VALUES(1, 1, 1);
 INSERT INTO orderedBook(order_id, book_id, quantity)
 VALUES(1, 3, 2);
+=======
+-- 장바구니 담기
+INSERT INTO cartItems (book_id, quantity, user_id) VALUES (1, 1, 1);
+INSERT INTO cartItems (book_id, quantity, user_id) VALUES (3, 2, 1);
+INSERT INTO cartItems (book_id, quantity, user_id) VALUES (2, 1, 1);
+INSERT INTO cartItems (book_id, quantity, user_id) VALUES (1, 1, 2);
+INSERT INTO cartItems (book_id, quantity, user_id) VALUES (2, 1, 2);
+
+-- 장바구니 아이템 목록 조회
+SELECT c.id, book_id, title, summary, quantity, price
+FROM cartItems c LEFT JOIN books b
+ON c.book_id=b.id;
+
+-- 장바구니 아이템 조회
+DELETE FROM cartItems WHERE id = ?;
+
+-- 장바구니에서 선택한(장바구니 도서 id) 아이템 목록 조회 = 선택한 장바구니 상품 목록 조회
+SELECT * FROM BookShop.cartItems
+WHERE user_id = 1
+AND id IN(1,3);
