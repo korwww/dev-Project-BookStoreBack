@@ -49,8 +49,20 @@ const orderController = {
         let result = await deleteCartItems(conn, items);
         return res.status(StatusCodes.OK).json(result);
     },
-    getOrders: (req, res) => {
-        res.status(200).json('주문 목록 조회');
+    getOrders: async (req, res) => {
+        const conn = await mariadb.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'root',
+            database: 'BookShop',
+            dateStrings: true
+        });
+        let sql = `select orders.id, created_at, address, receiver, contact,
+                    book_title, total_Price, total_quantity
+                    from BookShop.orders LEFT JOIN BookShop.delivery
+                    on orders.delivery_id = delivery.id;`
+        let [rows, fields] = await conn.query(sql);
+        return res.statuscodes(StatusCodes.OK).json(rows);
     },
     getOrderDetail: (req, res) => {
         const orderId = req.params.orderId;
