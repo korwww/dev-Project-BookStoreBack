@@ -5,13 +5,6 @@ const { StatusCodes } = require('http-status-codes');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const ensureAuthorization = (req) => {
-    const { authorization: receivedJwt } = req.headers;
-
-    let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-    return decodedJwt;
-}
-
 const likeController = {
     addLike: (req, res) => {
         const { booksId } = req.params;
@@ -50,6 +43,13 @@ const likeController = {
             }
         );
     }
+}
+
+const ensureAuthorization = (req) => {
+    const { authorization: receivedJwt } = req.headers;
+
+    let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+    return decodedJwt;
 }
 
 module.exports = Object.freeze(likeController);
