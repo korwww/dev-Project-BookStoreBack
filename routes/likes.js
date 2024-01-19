@@ -21,7 +21,7 @@ const validate = (req, res, next) => {
 }
 
 router
-    .route('/:booksId')
+    .route('/:bookId')
     .post(addLike)
     .delete(removeLike);
 

@@ -5,14 +5,18 @@ const { StatusCodes } = require('http-status-codes');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const ensureAuthorization = (req) => {
+    const { authorization: receivedJwt } = req.headers;
+
+    let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+    return decodedJwt;
+}
 
 const likeController = {
     addLike: (req, res) => {
         const { booksId } = req.params;
-        const { authorization: receivedJwt } = req.headers;
 
-        let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-        let { id: userId } = decodedJwt;
+        const userId  = ensureAuthorization(req).id;
 
         let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
         let values = [userId, booksId];
@@ -28,8 +32,13 @@ const likeController = {
         );
     },
     removeLike: (req, res) => {
+        const { bookId } = req.params;
+
+        const userId  = ensureAuthorization(req).id;
+
         let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
-        let values = [1, req.params.booksId];
+        
+        let values = [userId, bookId];
         conn.query(sql, values,
             function (err, results) {
                 if (err) {
