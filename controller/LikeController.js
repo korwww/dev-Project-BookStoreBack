@@ -9,7 +9,19 @@ const likeController = {
     addLike: (req, res) => {
         const { booksId } = req.params;
 
-        const userId  = ensureAuthorization(req).id;
+        const authorization = ensureAuthorization(req);
+
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        }
+
+        const userId = authorization.id;
 
         let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
         let values = [userId, booksId];
@@ -46,10 +58,17 @@ const likeController = {
 }
 
 const ensureAuthorization = (req) => {
-    const { authorization: receivedJwt } = req.headers;
+    try{
+        const { authorization: receivedJwt } = req.headers;
 
-    let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-    return decodedJwt;
+        let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+        return decodedJwt;
+    } catch (err) {
+        console.log(err.name);
+        console.log(err.message);
+
+        return err;
+    }
 }
 
 module.exports = Object.freeze(likeController);
