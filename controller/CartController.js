@@ -3,9 +3,6 @@ const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../auth');
 
-const dotenv = require('dotenv');
-dotenv.config();
-
 const cartController = {
     addItemsToCart: (req, res) => {
         const { book_id, quantity } = req.body;
