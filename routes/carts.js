@@ -23,6 +23,6 @@ router
     .get(getCartItems)
     .post(addItemsToCart)
 
-router.delete('/:id', removeCartItems);
+router.delete('/:cartItemId', removeCartItems);
 
 module.exports = router;

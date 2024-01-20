@@ -1,10 +1,32 @@
 const conn = require('../mariadb');
+const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
+const ensureAuthorization = require('../auth');
+
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const likeController = {
     addLike: (req, res) => {
+        const book_id = req.params.bookId;
+
+        const authorization = ensureAuthorization(req);
+
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        }
+
+        const user_id = authorization.id;
+
         let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
-        let values = [1, req.params.booksId];
+        let values = [user_id, book_id];
         conn.query(sql, values,
             function (err, results) {
                 if (err) {
@@ -17,8 +39,13 @@ const likeController = {
         );
     },
     removeLike: (req, res) => {
+        const { bookId } = req.params;
+
+        const userId  = ensureAuthorization(req).id;
+
         let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
-        let values = [1, req.params.booksId];
+        
+        let values = [userId, bookId];
         conn.query(sql, values,
             function (err, results) {
                 if (err) {

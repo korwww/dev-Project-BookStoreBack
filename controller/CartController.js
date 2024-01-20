@@ -1,11 +1,30 @@
 const conn = require('../mariadb');
+const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
+const ensureAuthorization = require('../auth');
+
+const dotenv = require('dotenv');
+dotenv.config();
 
 const cartController = {
     addItemsToCart: (req, res) => {
-        const { book_id, quantity, user_id } = req.body;
+        const { book_id, quantity } = req.body;
+        const authorization = ensureAuthorization(req);
+
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        }
+
+        const user_id = authorization.id;
         let sql = `INSERT INTO cartItems (book_id, quantity, user_id) VALUES (?, ?, ?);`;
         let values = [book_id, quantity, user_id];
+
         conn.query(sql, values,
             function (err, results) {
                 if (err) {
@@ -33,7 +52,7 @@ const cartController = {
         }
 
         const user_id = authorization.id;
-
+      
         let sql = `SELECT c.id, book_id, title, summary, quantity, price
         FROM cartItems c LEFT JOIN books b
         ON c.book_id=b.id
@@ -58,9 +77,10 @@ const cartController = {
         );
     },
     removeCartItems: (req, res) => {
-        const {id} = req.params;
+        const {cartItemId} = req.params;
+        
         let sql = `DELETE FROM cartItems WHERE id = ?;`;
-        conn.query(sql, bookId,
+        conn.query(sql, cartItemId,
             function (err, results) {
                 if (err) {
                     console.log(err);
