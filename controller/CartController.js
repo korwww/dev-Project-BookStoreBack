@@ -38,14 +38,34 @@ const cartController = {
     },
     getCartItems: (req, res) => {
         const { selected } = req.body;
-        const user_id  = ensureAuthorization(req).id;
+        const authorization = ensureAuthorization(req);
 
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        }
+        if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        }
+
+        const user_id = authorization.id;
+      
         let sql = `SELECT c.id, book_id, title, summary, quantity, price
-                    FROM cartItems c LEFT JOIN books b
-                    ON c.book_id=b.id
-                    WHERE user_id = ? AND c.id IN (?);`;
+        FROM cartItems c LEFT JOIN books b
+        ON c.book_id=b.id
+        WHERE user_id = ?`
 
-        conn.query(sql, [user_id, selected],
+        let values = [user_id];
+        if(selected){
+            sql += ` AND c.id IN (?)`;
+            values.push(selected);
+        }
+        sql += `;`;
+
+        conn.query(sql, values,
             (err, results) => {
                 if (err) {
                     console.log(err);
