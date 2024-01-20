@@ -1,6 +1,7 @@
 const conn = require('../mariadb');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
+const ensureAuthorization = require('../auth');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -69,20 +70,6 @@ const cartController = {
                 return res.status(StatusCodes.OK).json(results);
             }
         );
-    }
-}
-
-const ensureAuthorization = (req) => {
-    try{
-        const { authorization: receivedJwt } = req.headers;
-
-        let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-        return decodedJwt;
-    } catch (err) {
-        console.log(err.name);
-        console.log(err.message);
-
-        return err;
     }
 }
 
