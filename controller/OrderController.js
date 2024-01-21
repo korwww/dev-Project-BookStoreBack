@@ -46,7 +46,7 @@ const orderController = {
         sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id)
                 VALUES(?, ?, ?, ?, ?);`
         values = [firstBookTitle, totalQuantity, totalPrice, user_id, order_id];
-        [results] = await conn.execute(sql, values);
+        await conn.execute(sql, values);
 
         sql = `SELECT book_id, quantity FROM cartItems WHERE id IN (?)`;
         let [orderItems, fileds] = await conn.query(sql, [items]);
