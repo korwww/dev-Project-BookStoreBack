@@ -1,6 +1,9 @@
 const conn = require('../mariadb');
 const mariadb = require('mysql2/promise');
 const { StatusCodes } = require('http-status-codes');
+const jwt = require('jsonwebtoken');
+const ensureAuthorization = require('../auth');
+
 
 const deleteCartItems = async (conn, items) => {
     let sql = `DELETE FROM cartItems WHERE id IN (?);`;
@@ -18,8 +21,22 @@ const orderController = {
             database: 'BookShop',
             dateStrings: true
         });
+        
+        const authorization = ensureAuthorization(req);
 
-        const { items, delivery, firstBookTitle, totalQuantity, totalPrice, userId } = req.body;
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        }
+
+        const user_id = authorization.id;
+
+        const { items, delivery, firstBookTitle, totalQuantity, totalPrice } = req.body;
 
         let sql = `INSERT INTO delivery (address, receiver, contact) VALUES(?, ?, ?);`;
         let values = [delivery.address, delivery.receiver, delivery.contact];
@@ -28,7 +45,7 @@ const orderController = {
 
         sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id)
                 VALUES(?, ?, ?, ?, ?);`
-        values = [firstBookTitle, totalQuantity, totalPrice, userId, order_id];
+        values = [firstBookTitle, totalQuantity, totalPrice, user_id, order_id];
         [results] = await conn.execute(sql, values);
 
         sql = `SELECT book_id, quantity FROM cartItems WHERE id IN (?)`;
@@ -66,6 +83,7 @@ const orderController = {
     },
     getOrderDetail: async (req, res) => {
         const {orderId} = req.params;
+        
         const conn = await mariadb.createConnection({
             host: 'localhost',
             user: 'root',

@@ -1,8 +1,9 @@
 const conn = require('../mariadb');
 const { StatusCodes } = require('http-status-codes');
+const ensureAuthorization = require('../auth');
 
 const bookController = {
-    selectBooksByCategory: (req, res) => {
+    getBooksByCategory: (req, res) => {
         const { categoryId, isNew, limit, currentPage } = req.query;
 
         let offset = limit * (currentPage-1);
@@ -37,19 +38,32 @@ const bookController = {
             }
         );
     },
-
-    selectSingleBook: (req, res) => {
-        let {user_id} = req.body;
+    getSingleBook: (req, res) => {
         let booksId = req.params.booksId;
+        const authorization = ensureAuthorization(req);
 
         let sql = `SELECT *, 
-                    (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes,
-                    (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked
-                    FROM books
-                    LEFT JOIN category
-                    ON books.category_id = category.category_id
-                    WHERE books.id=?;`;
-        let values = [user_id, booksId, booksId]        
+                   (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes`;
+        let values=[];
+
+        if(authorization instanceof jwt.TokenExpiredError){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message" : "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message" : "잘못된 토큰."
+            });
+        } else if (authorization instanceof ReferenceError){
+            sql += `, (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked`;
+            values.push(authorization.id);
+        }
+        values.push(booksId, booksId);
+
+        sql += `FROM books
+                LEFT JOIN category
+                ON books.category_id = category.category_id
+                WHERE books.id=?;`;
 
         conn.query(sql, values,
             (err, results) => {
