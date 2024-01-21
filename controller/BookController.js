@@ -9,7 +9,7 @@ const bookController = {
 
         let offset = limit * (currentPage-1);
 
-        let sql = `SELECT *, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes FROM books`;
+        let sql = `SELECT id, title, img, summary, author, price, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes, pub_date FROM books`;
         let values = [];
         let conditions = [];
         
@@ -59,7 +59,7 @@ const bookController = {
         let booksId = req.params.booksId;
         const authorization = ensureAuthorization(req);
 
-        let sql = `SELECT *, 
+        let sql = `SELECT books.id, books.title, img, category.category_name, isbn, summary, detail, author, pages, contents, price,
                    (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes `;
         let values=[];
 
@@ -79,7 +79,8 @@ const bookController = {
         }
         values.push(booksId, booksId);
 
-        sql += `FROM books
+        sql += `, pub_date
+                FROM books
                 LEFT JOIN category
                 ON books.category_id = category.category_id
                 WHERE books.id=?;`;
