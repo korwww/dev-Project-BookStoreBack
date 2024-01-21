@@ -63,8 +63,8 @@ const orderController = {
             console.log("삽입 실패! cartItem이 없어 null값이 들어가므로 not null 제약에 의해 에러");
         }
 
-        let result = await deleteCartItems(conn, items);
-        return res.status(StatusCodes.OK).json(result);
+        let response = await deleteCartItems(conn, items);
+        return res.status(StatusCodes.OK).json(response);
     },
     getOrders: async (req, res) => {
         const conn = await mariadb.createConnection({
