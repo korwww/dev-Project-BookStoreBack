@@ -1,4 +1,5 @@
 const conn = require('../mariadb');
+const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../auth');
 
@@ -59,7 +60,7 @@ const bookController = {
         const authorization = ensureAuthorization(req);
 
         let sql = `SELECT *, 
-                   (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes`;
+                   (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes `;
         let values=[];
 
         if(authorization instanceof jwt.TokenExpiredError){
@@ -71,7 +72,9 @@ const bookController = {
                 "message" : "잘못된 토큰."
             });
         } else if (authorization instanceof ReferenceError){
-            sql += `, (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked`;
+
+        } else {
+            sql += `, (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked `;
             values.push(authorization.id);
         }
         values.push(booksId, booksId);
