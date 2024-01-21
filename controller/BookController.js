@@ -25,7 +25,7 @@ const bookController = {
         sql += ` LIMIT ? OFFSET ?`;
         values.push(parseInt(limit), offset);
 
-        console.log(require('mysql2').format(sql, values));
+        let response = {};
         conn.query(sql, values,
             (err, results) => {
                 if (err) {
@@ -33,8 +33,24 @@ const bookController = {
                     return res.status(StatusCodes.BAD_REQUEST).end();
                 }
 
-                if (results.length) return res.status(StatusCodes.OK).json(results);
-                else return res.status(StatusCodes.NOT_FOUND).end();
+                response.books = results;
+            }
+        );
+        
+        sql = `SELECT count(*) AS total_count FROM books`
+        
+        conn.query(sql,
+            (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(StatusCodes.BAD_REQUEST).end();
+                }
+                let pagination = {};
+                pagination.currentPage = parseInt(currentPage);
+                pagination.totalCount = results[0]["total_count"];
+                response.pagination = pagination;
+
+                return res.status(StatusCodes.OK).json(response);
             }
         );
     },
