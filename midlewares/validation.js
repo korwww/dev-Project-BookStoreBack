@@ -11,7 +11,7 @@ const validateErrorHandler = (req, res, next) => {
 }
 
 const checkAllowedQueryParams = () => {
-    const allowedParams = ['limit', 'currentPage', 'categoryId', 'new'];
+    const allowedParams = ['limit', 'currentPage', 'categoryId', 'isNew'];
     return query().custom((value, { req }) => {
         const queryParams = Object.keys(req.query);
         for (let param of queryParams) {
@@ -139,10 +139,10 @@ const checkQueryParams = () => [
         .isInt({ min: 0 })
         .withMessage('categoryId는 0 이상의 정수이어야 합니다.'),
 
-    query('isNew')
+        query('isNew')
         .optional()
-        .isBoolean()
-        .withMessage('new는 boolean 타입이어야 합니다.')
+        .isIn(['true', 'false'])
+        .withMessage('isNew는 \'true\' 또는 \'false\'의 값이어야 합니다.')
 ];
 
 module.exports = Object.freeze({
