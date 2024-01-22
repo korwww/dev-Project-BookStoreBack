@@ -4,8 +4,8 @@ const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
 
 const bookController = {
-    getBooksByCategory: (req, res) => {
-        const { categoryId, isNew, limit, currentPage } = req.query;
+    getAllBooks: (req, res) => {
+        const { categoryId, isNew, limit, currentPage = 1 } = req.query;
 
         let offset = limit * (currentPage-1);
 
@@ -23,8 +23,15 @@ const bookController = {
         if (conditions.length > 0) {
             sql += ` WHERE ` + conditions.join(` AND `);
         }
-        sql += ` LIMIT ? OFFSET ?`;
-        values.push(parseInt(limit), offset);
+        if (limit){
+            sql += ` LIMIT ? `;
+            values.push(parseInt(limit));
+        }
+        if (offset){
+            sql += `OFFSET ?`;
+            values.push(parseInt(limit));
+        }
+        sql += `;`;
 
         let response = {};
         conn.query(sql, values,
