@@ -4,7 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../auth');
 
 const bookController = {
-    getBooksByCategory: (req, res) => {
+    getAllBooks: (req, res) => {
         const { categoryId, isNew, limit, currentPage } = req.query;
 
         let offset = limit * (currentPage-1);
