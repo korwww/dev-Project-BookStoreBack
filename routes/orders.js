@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const conn = require('../mariadb');
-const {getOrders, order , getOrderDetail} = require('../controller/OrderController');
-const {validateErrorHandler} = require('../midlewares/validation');
+const { getOrders, order, getOrderDetail } = require('../controller/OrderController');
+const { validateErrorHandler, checkParamsId, checkBodyArrayItems, checkBodyOrders} = require('../midlewares/validation');
 
 const jwt = require('jsonwebtoken');
 
@@ -14,8 +13,12 @@ router.use(express.json());
 router
     .route('/')
     .get(getOrders)
-    .post(order);
+    .post(
+        [...checkBodyArrayItems('items'), ...checkBodyOrders(), validateErrorHandler], 
+        order
+    );
 
-router.get('/:orderId', getOrderDetail);
+router.get('/:id',
+    [...checkParamsId(), validateErrorHandler], getOrderDetail);
 
 module.exports = router;

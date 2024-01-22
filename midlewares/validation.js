@@ -1,4 +1,4 @@
-const { body, param, validationResult } = require('express-validator');
+const { body, param, validationResult, query } = require('express-validator');
 const validatePassword = require('../utils/validatePassword')
 const { StatusCodes } = require('http-status-codes');
 
@@ -10,16 +10,30 @@ const validateErrorHandler = (req, res, next) => {
     return res.status(StatusCodes.BAD_REQUEST).json(err.array());
 }
 
-const checkBodyEmail = () =>
+const checkAllowedQueryParams = () => {
+    const allowedParams = ['limit', 'currentPage', 'categoryId', 'new'];
+    return query().custom((value, { req }) => {
+        const queryParams = Object.keys(req.query);
+        for (let param of queryParams) {
+            if (!allowedParams.includes(param)) {
+                throw new Error(`${param}는 허용되지 않는 쿼리 파라미터입니다.`);
+            }
+        }
+        return true;
+    });
+};
+
+const checkBodyEmail = () => [
     body('email')
         .notEmpty()
         .withMessage('이메일은 필수 입력 항목입니다.')
         .isString()
         .withMessage('이메일은 문자열 형태로 입력되어야 합니다.')
         .isEmail()
-        .withMessage('이메일 형식이 올바르지 않습니다');
+        .withMessage('이메일 형식이 올바르지 않습니다')
+];
 
-const checkBodyPassword = () =>
+const checkBodyPassword = () => [
     body('password')
         .notEmpty()
         .withMessage('비밀번호는 필수 입력 항목입니다.')
@@ -49,18 +63,95 @@ const checkBodyPassword = () =>
             }
 
             return true;
-        });
+        })
+];
 
-const checkParamsId = () =>
-    param('id')
+const checkBodyArrayItems = (key) => [
+    body(key)
+        .isArray()
+        .withMessage(`${key}는 배열이어야 합니다.`)
         .notEmpty()
+        .withMessage(`${key}는 비어있지 않아야 합니다.`)
+];
+
+const checkBodyOrders = () => [
+    body('delivery')
+        .isObject()
+        .withMessage('delivery는 객체이어야 합니다.')
+        .notEmpty()
+        .withMessage('delivery는 비어있지 않아야 합니다.'),
+
+    body('delivery.address')
+        .isString()
+        .withMessage('address는 문자열이어야 합니다.')
+        .notEmpty()
+        .withMessage('address는 비어있지 않아야 합니다.'),
+
+    body('delivery.receiver')
+        .isString()
+        .withMessage('receiver는 문자열이어야 합니다.')
+        .notEmpty()
+        .withMessage('receiver는 비어있지 않아야 합니다.'),
+
+    body('delivery.contact')
+        .isString()
+        .withMessage('contact는 문자열이어야 합니다.')
+        .notEmpty()
+        .withMessage('contact는 비어있지 않아야 합니다.')
+        .matches(/^(010)-\d{4}-\d{4}$/)
+        .withMessage('contact는 010-0000-0000 형식이어야 합니다.'),
+
+    body('totalQuantity')
+        .isInt()
+        .withMessage('totalQuantity는 정수여야 합니다.'),
+
+    body('totalPrice')
+        .isInt()
+        .withMessage('totalPrice는 정수여야 합니다.'),
+
+    body('bookTitle')
+        .isString()
+        .withMessage('bookTitle은 문자열이어야 합니다.')
+        .notEmpty()
+        .withMessage('bookTitle은 비어있지 않아야 합니다.')
+];
+
+const checkParamsId = () => [
+    param('id')
         .toInt()
         .isInt()
-        .withMessage('ID는 정수여야 합니다.');
+        .withMessage('ID는 정수여야 합니다.')
+];
 
-module.exports = {
+const checkQueryParams = () => [
+    query('limit')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('limit는 1 이상의 정수이어야 합니다.'),
+
+    query('currentPage')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('currentPage는 1 이상의 정수이어야 합니다.'),
+
+    query('categoryId')
+        .optional()
+        .isInt({ min: 0 })
+        .withMessage('categoryId는 0 이상의 정수이어야 합니다.'),
+
+    query('isNew')
+        .optional()
+        .isBoolean()
+        .withMessage('new는 boolean 타입이어야 합니다.')
+];
+
+module.exports = Object.freeze({
     validateErrorHandler,
+    checkAllowedQueryParams,
     checkBodyEmail,
     checkBodyPassword,
-    checkParamsId
-}
+    checkBodyArrayItems,
+    checkBodyOrders,
+    checkParamsId,
+    checkQueryParams
+});

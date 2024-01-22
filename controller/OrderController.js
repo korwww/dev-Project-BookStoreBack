@@ -110,7 +110,7 @@ const orderController = {
             });
         }
 
-        const {orderId} = req.params;
+        const orderId = req.params.id;
         
         const conn = await mariadb.createConnection({
             host: 'localhost',
