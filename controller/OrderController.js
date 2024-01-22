@@ -2,7 +2,7 @@ const conn = require('../mariadb');
 const mariadb = require('mysql2/promise');
 const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
-const ensureAuthorization = require('../auth');
+const ensureAuthorization = require('../midlewares/auth');
 
 
 const deleteCartItems = async (conn, items) => {
