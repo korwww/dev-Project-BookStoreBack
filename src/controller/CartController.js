@@ -4,7 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
 
 const cartController = {
-    addItemsToCart: (req, res) => {
+    addItemsToCart: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
         if(authorization instanceof jwt.TokenExpiredError){
@@ -23,18 +23,15 @@ const cartController = {
         let sql = `INSERT INTO cartItems (book_id, quantity, user_id) VALUES (?, ?, ?);`;
         let values = [book_id, quantity, user_id];
 
-        conn.query(sql, values,
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.CREATED).json(results);
-            }
-        );
+        try {
+            const results = await conn.query(sql, values);
+            return res.status(StatusCodes.CREATED).json(results);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     },
-    getCartItems: (req, res) => {
+    getCartItems: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
         if(authorization instanceof jwt.TokenExpiredError){
@@ -63,18 +60,15 @@ const cartController = {
         }
         sql += `;`;
 
-        conn.query(sql, values,
-            (err, results) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.OK).json(results);
-            }
-        );
+        try {
+            const results = await conn.query(sql, values);
+            return res.status(StatusCodes.OK).json(results);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     },
-    removeCartItems: (req, res) => {
+    removeCartItems: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
         if(authorization instanceof jwt.TokenExpiredError){
@@ -90,16 +84,13 @@ const cartController = {
         const cartItemId = req.params.id;
         
         let sql = `DELETE FROM cartItems WHERE id = ?;`;
-        conn.query(sql, cartItemId,
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.OK).json(results);
-            }
-        );
+        try {
+            const results = await conn.query(sql, cartItemId);
+            return res.status(StatusCodes.OK).json(results);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     }
 }
 
