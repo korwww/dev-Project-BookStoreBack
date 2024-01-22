@@ -15,8 +15,9 @@ class User {
     }
 
     async save() {
+        const hashPassword = crypto.pbkdf2Sync(this.password, this.salt, 10000, 10, 'sha512').toString('base64');
         const sql = `INSERT INTO users (email, password, salt) VALUES(?, ?, ?)`;
-        const values = [this.email, this.password, this.salt];
+        const values = [this.email, hashPassword, this.salt];
         return await conn.query(sql, values);
     }
 

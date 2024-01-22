@@ -1,9 +1,9 @@
 const {StatusCodes} = require('http-status-codes');
-const AuthService = require('../services/UserService');
+const UserService = require('../services/UserService');
 
 const join = async (req, res) => {
     try {
-        const user = await AuthService.join(req.body.email, req.body.password);
+        const user = await UserService.join(req.body.email, req.body.password);
         if(user) return res.status(StatusCodes.CREATED).json(user);
         return res.status(StatusCodes.BAD_REQUEST).end();
     } catch (err) {
@@ -14,7 +14,7 @@ const join = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const token = await AuthService.login(req.body.email, req.body.password);
+        const token = await UserService.login(req.body.email, req.body.password);
         if (token) {
             res.cookie("token", token, { httpOnly : true });
             return res.status(StatusCodes.OK).json({token});
@@ -31,7 +31,7 @@ const login = async (req, res) => {
 
 const passwordResetRequest = async (req, res) => {
     try {
-        const email = await AuthService.passwordResetRequest(req.body.email);
+        const email = await UserService.passwordResetRequest(req.body.email);
         if (email) {
             return res.status(StatusCodes.OK).json({email});
         } else {
@@ -45,7 +45,7 @@ const passwordResetRequest = async (req, res) => {
 
 const passwordReset = async (req, res) => {
     try {
-        const user = await AuthService.passwordReset(req.body.email, req.body.password);
+        const user = await UserService.passwordReset(req.body.email, req.body.password);
         if(user) return res.status(StatusCodes.OK).json(user);
         return res.status(StatusCodes.BAD_REQUEST).end();
     } catch (err) {
