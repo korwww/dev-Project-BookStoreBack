@@ -51,7 +51,7 @@ const cartController = {
         
         const { selected } = req.body;
       
-        let sql = `SELECT c.id, book_id, title, summary, quantity, price
+        let sql = `SELECT c.id, book_id AS bookId, title, summary, quantity, price
         FROM cartItems c LEFT JOIN books b
         ON c.book_id=b.id
         WHERE user_id = ?`

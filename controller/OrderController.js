@@ -89,8 +89,8 @@ const orderController = {
             dateStrings: true
         });
 
-        let sql = `select orders.id AS order_id, created_at, address, receiver, contact,
-                    book_title, total_quantity, total_Price
+        let sql = `select orders.id AS orderId, created_at AS createdAt, address, receiver, contact,
+                    book_title AS bookTitle, total_quantity AS totalQuantity, total_Price AS totalPrice
                     from BookShop.orders LEFT JOIN BookShop.delivery
                     on orders.delivery_id = delivery.id
                     WHERE user_id = ?;`
@@ -120,7 +120,7 @@ const orderController = {
             dateStrings: true
         });
 
-        let sql = `select book_id, title, author, price, quantity
+        let sql = `select book_id AS bookId, title, author, price, quantity
                     from BookShop.orderedBook LEFT JOIN BookShop.books
                     on orderedBook.book_id = books.id
                     WHERE order_id = ?;`
