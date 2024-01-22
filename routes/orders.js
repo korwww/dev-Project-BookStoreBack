@@ -1,30 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const conn = require('../mariadb');
-const { body, param, validationResult } = require('express-validator');
-const {getOrders, order , getOrderDetail} = require('../controller/OrderController');
-
-const jwt = require('jsonwebtoken');
+const { getOrders, order, getOrderDetail } = require('../controller/OrderController');
+const { validateErrorHandler, checkParamsId, checkBodyArrayItems, checkBodyOrders} = require('../midlewares/validation');
 
 const dotenv = require('dotenv');
 dotenv.config();
 
 router.use(express.json());
 
-const validate = (req, res, next) => {
-    const err = validationResult(req);
-    if (err.isEmpty()) {
-        return next();
-    } else {
-        return res.status(400).json(err.array());
-    }
-}
-
 router
     .route('/')
     .get(getOrders)
-    .post(order);
+    .post(
+        [...checkBodyArrayItems('items'), ...checkBodyOrders(), validateErrorHandler], 
+        order
+    );
 
-router.get('/:orderId', getOrderDetail);
+router.get('/:id',
+    [...checkParamsId(), validateErrorHandler], getOrderDetail);
 
 module.exports = router;

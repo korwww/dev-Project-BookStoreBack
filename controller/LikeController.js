@@ -5,7 +5,7 @@ const ensureAuthorization = require('../midlewares/auth');
 
 const likeController = {
     addLike: (req, res) => {
-        const book_id = req.params.bookId;
+        const book_id = req.params.id;
 
         const authorization = ensureAuthorization(req);
 
@@ -35,7 +35,7 @@ const likeController = {
         );
     },
     removeLike: (req, res) => {
-        const { bookId } = req.params;
+        const bookId = req.params.id;
 
         const userId  = ensureAuthorization(req).id;
 

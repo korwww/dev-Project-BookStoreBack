@@ -87,7 +87,7 @@ const cartController = {
             });
         }
 
-        const {cartItemId} = req.params;
+        const cartItemId = req.params.id;
         
         let sql = `DELETE FROM cartItems WHERE id = ?;`;
         conn.query(sql, cartItemId,

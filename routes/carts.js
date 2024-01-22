@@ -1,28 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const conn = require('../mariadb');
-const { body, param, validationResult } = require('express-validator');
-const {addItemsToCart, getCartItems, removeCartItems} = require('../controller/CartController');
+const { addItemsToCart, getCartItems, removeCartItems } = require('../controller/CartController');
+const { validateErrorHandler, checkBodyCarts, checkBodyArrayItems, checkParamsId } = require('../midlewares/validation');
 
 const dotenv = require('dotenv');
 dotenv.config();
 
 router.use(express.json());
 
-const validate = (req, res, next) => {
-    const err = validationResult(req);
-    if (err.isEmpty()) {
-        return next();
-    } else {
-        return res.status(400).json(err.array());
-    }
-}
-
 router
     .route('/')
-    .get(getCartItems)
-    .post(addItemsToCart)
+    .get([...checkBodyArrayItems('selected'), validateErrorHandler], getCartItems)
+    .post([...checkBodyCarts(), validateErrorHandler], addItemsToCart)
 
-router.delete('/:cartItemId', removeCartItems);
+router.delete('/:id',
+    [...checkParamsId(), validateErrorHandler],
+    removeCartItems);
 
 module.exports = router;
