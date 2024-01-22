@@ -110,11 +110,11 @@ const checkBodyOrders = () => [
         .isInt()
         .withMessage('totalPrice는 정수여야 합니다.'),
 
-    body('bookTitle')
+    body('firstBookTitle')
         .isString()
-        .withMessage('bookTitle은 문자열이어야 합니다.')
+        .withMessage('firstBookTitle은 문자열이어야 합니다.')
         .notEmpty()
-        .withMessage('bookTitle은 비어있지 않아야 합니다.')
+        .withMessage('firstBookTitle은 비어있지 않아야 합니다.')
 ];
 
 const checkBodyCarts = () => [
