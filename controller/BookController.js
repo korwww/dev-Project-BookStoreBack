@@ -63,7 +63,7 @@ const bookController = {
         );
     },
     getSingleBook: (req, res) => {
-        let booksId = req.params.booksId;
+        let booksId = req.params.id;
         const authorization = ensureAuthorization(req);
 
         let sql = `SELECT books.id, books.title, img, category.category_name AS categoryName, isbn, summary, detail, author, pages, contents, price,

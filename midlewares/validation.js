@@ -51,8 +51,16 @@ const checkBodyPassword = () =>
             return true;
         });
 
+const checkParamsId = () =>
+    param('id')
+        .notEmpty()
+        .toInt()
+        .isInt()
+        .withMessage('ID는 정수여야 합니다.');
+
 module.exports = {
     validateErrorHandler,
     checkBodyEmail,
-    checkBodyPassword
+    checkBodyPassword,
+    checkParamsId
 }
