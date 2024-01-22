@@ -10,7 +10,7 @@ const validateErrorHandler = (req, res, next) => {
     return res.status(StatusCodes.BAD_REQUEST).json(err.array());
 }
 
-const checkEmail = () => 
+const checkBodyEmail = () => 
     body('email')
     .notEmpty()
     .withMessage('이메일은 필수 입력 항목입니다.')
@@ -19,7 +19,7 @@ const checkEmail = () =>
     .isEmail()
     .withMessage('이메일 형식이 올바르지 않습니다');
 
-const checkPassword = () => 
+const checkBodyPassword = () => 
 body('password')
 .notEmpty()
 .withMessage('비밀번호는 필수 입력 항목입니다.')
@@ -52,6 +52,6 @@ body('password')
 
 module.exports = {
     validateErrorHandler,
-    checkEmail,
-    checkPassword
+    checkBodyEmail,
+    checkBodyPassword
 }

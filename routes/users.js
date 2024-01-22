@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
 const {join, login , passwordResetRequest, passwordReset} = require('../controller/UserController');
-const {validateErrorHandler, checkEmail, checkPassword} = require('../midlewares/validation');
+const {validateErrorHandler, checkBodyEmail, checkBodyPassword} = require('../midlewares/validation');
 const { body, param, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 
@@ -12,13 +12,13 @@ dotenv.config();
 router.use(express.json());
 
 router.post('/join',
-    [checkEmail(), checkPassword(), validateErrorHandler], join);
+    [checkBodyEmail(), checkBodyPassword(), validateErrorHandler], join);
 
 router.post('/login',
-    [checkEmail(), checkPassword(), validateErrorHandler], login);
+    [checkBodyEmail(), checkBodyPassword(), validateErrorHandler], login);
 
 router.post('/reset',
-    [checkEmail(), checkPassword(), validateErrorHandler], passwordResetRequest);
+    [checkBodyEmail(), checkBodyPassword(), validateErrorHandler], passwordResetRequest);
 
 router.put('/reset', passwordReset);
 
