@@ -1,4 +1,4 @@
-const conn = require('../mariadb');
+const conn = require('../database/mariadb');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const crypto = require('crypto');

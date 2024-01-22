@@ -1,4 +1,4 @@
-const conn = require('../mariadb');
+const conn = require('../database/mariadb');
 const mariadb = require('mysql2/promise');
 const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
