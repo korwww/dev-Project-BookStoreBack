@@ -3,8 +3,6 @@ const router = express.Router();
 const { getOrders, order, getOrderDetail } = require('../controller/OrderController');
 const { validateErrorHandler, checkParamsId, checkBodyArrayItems, checkBodyOrders} = require('../midlewares/validation');
 
-const jwt = require('jsonwebtoken');
-
 const dotenv = require('dotenv');
 dotenv.config();
 

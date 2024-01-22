@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const conn = require('../mariadb');
-const {addLike, removeLike} = require('../controller/LikeController');
-const {validateErrorHandler} = require('../midlewares/validation');
+const { addLike, removeLike } = require('../controller/LikeController');
+const { validateErrorHandler, checkParamsId } = require('../midlewares/validation');
 
 const jwt = require('jsonwebtoken');
 
@@ -12,8 +12,8 @@ dotenv.config();
 router.use(express.json());
 
 router
-    .route('/:bookId')
-    .post(addLike)
-    .delete(removeLike);
+    .route('/:id')
+    .post([...checkParamsId(), validateErrorHandler], addLike)
+    .delete([...checkParamsId(), validateErrorHandler], removeLike);
 
 module.exports = router;
