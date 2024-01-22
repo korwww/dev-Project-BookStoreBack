@@ -24,7 +24,7 @@ const cartController = {
         let values = [book_id, quantity, user_id];
 
         try {
-            const results = await conn.query(sql, values);
+            const [results] = await conn.query(sql, values);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);
@@ -61,7 +61,7 @@ const cartController = {
         sql += `;`;
 
         try {
-            const results = await conn.query(sql, values);
+            const [results] = await conn.query(sql, values);
             return res.status(StatusCodes.OK).json(results);
         } catch (err) {
             console.log(err);
@@ -85,7 +85,7 @@ const cartController = {
         
         let sql = `DELETE FROM cartItems WHERE id = ?;`;
         try {
-            const results = await conn.query(sql, cartItemId);
+            const [results] = await conn.query(sql, cartItemId);
             return res.status(StatusCodes.OK).json(results);
         } catch (err) {
             console.log(err);
