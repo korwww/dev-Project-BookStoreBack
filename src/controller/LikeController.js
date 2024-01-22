@@ -4,7 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
 
 const likeController = {
-    addLike: (req, res) => {
+    addLike: async (req, res) => {
         const book_id = req.params.id;
 
         const authorization = ensureAuthorization(req);
@@ -23,18 +23,15 @@ const likeController = {
 
         let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
         let values = [user_id, book_id];
-        conn.query(sql, values,
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.CREATED).json(results);
-            }
-        );
+        try {
+            const [results] = await conn.query(sql, values);
+            return res.status(StatusCodes.CREATED).json(results);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     },
-    removeLike: (req, res) => {
+    removeLike: async (req, res) => {
         const bookId = req.params.id;
 
         const userId  = ensureAuthorization(req).id;
@@ -42,16 +39,13 @@ const likeController = {
         let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
         
         let values = [userId, bookId];
-        conn.query(sql, values,
-            function (err, results) {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                return res.status(StatusCodes.CREATED).json(results);
-            }
-        );
+        try {
+            const [results] = await conn.query(sql, values);
+            return res.status(StatusCodes.CREATED).json(results);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     }
 }
 
