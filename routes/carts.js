@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const conn = require('../mariadb');
-const {addItemsToCart, getCartItems, removeCartItems} = require('../controller/CartController');
-const {validateErrorHandler} = require('../midlewares/validation');
+const { addItemsToCart, getCartItems, removeCartItems } = require('../controller/CartController');
+const { validateErrorHandler, checkBodyCarts, checkBodyArrayItems, checkParamsId } = require('../midlewares/validation');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,9 +10,11 @@ router.use(express.json());
 
 router
     .route('/')
-    .get(getCartItems)
-    .post(addItemsToCart)
+    .get([...checkBodyArrayItems('selected'), validateErrorHandler], getCartItems)
+    .post([...checkBodyCarts(), validateErrorHandler], addItemsToCart)
 
-router.delete('/:cartItemId', removeCartItems);
+router.delete('/:id',
+    [...checkParamsId(), validateErrorHandler],
+    removeCartItems);
 
 module.exports = router;

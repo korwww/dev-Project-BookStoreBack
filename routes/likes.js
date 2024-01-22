@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const conn = require('../mariadb');
 const { addLike, removeLike } = require('../controller/LikeController');
 const { validateErrorHandler, checkParamsId } = require('../midlewares/validation');
 

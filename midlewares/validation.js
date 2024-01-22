@@ -68,6 +68,7 @@ const checkBodyPassword = () => [
 
 const checkBodyArrayItems = (key) => [
     body(key)
+        .optional()
         .isArray()
         .withMessage(`${key}는 배열이어야 합니다.`)
         .notEmpty()
@@ -116,6 +117,21 @@ const checkBodyOrders = () => [
         .withMessage('bookTitle은 비어있지 않아야 합니다.')
 ];
 
+const checkBodyCarts = () => [
+    body('book_id')
+        .notEmpty()
+        .withMessage('book_id는 필수 입력 항목입니다.')
+        .toInt()
+        .isInt()
+        .withMessage('book_id는 정수여야 합니다.'),
+    body('quantity')
+        .notEmpty()
+        .withMessage('quantity는 필수 입력 항목입니다.')
+        .toInt()
+        .isInt()
+        .withMessage('quantity는 정수여야 합니다.'),
+]
+
 const checkParamsId = () => [
     param('id')
         .toInt()
@@ -139,7 +155,7 @@ const checkQueryParams = () => [
         .isInt({ min: 0 })
         .withMessage('categoryId는 0 이상의 정수이어야 합니다.'),
 
-        query('isNew')
+    query('isNew')
         .optional()
         .isIn(['true', 'false'])
         .withMessage('isNew는 \'true\' 또는 \'false\'의 값이어야 합니다.')
@@ -152,6 +168,7 @@ module.exports = Object.freeze({
     checkBodyPassword,
     checkBodyArrayItems,
     checkBodyOrders,
+    checkBodyCarts,
     checkParamsId,
     checkQueryParams
 });
