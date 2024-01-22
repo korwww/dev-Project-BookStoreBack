@@ -9,12 +9,12 @@ app.listen(process.env.PORT,
 );
 
 const routes = [
-  { path: '/users', routes: '.src/routes/users' },
-  { path: '/books', routes: '.src/routes/books' },
-  { path: '/likes', routes: '.src/routes/likes' },
-  { path: '/carts', routes: '.src/routes/carts' },
-  { path: '/orders', routes: '.src/routes/orders'},
-  { path: '/category', routes: '.src/routes/category'}
+  { path: '/users', routes: './src/routes/users' },
+  { path: '/books', routes: './src/routes/books' },
+  { path: '/likes', routes: './src/routes/likes' },
+  { path: '/carts', routes: './src/routes/carts' },
+  { path: '/orders', routes: './src/routes/orders'},
+  { path: '/category', routes: './src/routes/category'}
 ];
 
 routes.forEach(route => {
