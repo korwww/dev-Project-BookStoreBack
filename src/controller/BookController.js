@@ -4,15 +4,15 @@ const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
 
 const bookController = {
-    getAllBooks: (req, res) => {
+    getAllBooks: async (req, res) => {
         const { categoryId, isNew, limit, currentPage = 1 } = req.query;
 
-        let offset = limit * (currentPage-1);
+        let offset = limit * (currentPage - 1);
 
         let sql = `SELECT id, title, img, summary, author, price, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes, pub_date AS pubDate FROM books`;
         let values = [];
         let conditions = [];
-        
+
         if (categoryId) {
             conditions.push(`category_id = ?`);
             values.push(categoryId);
@@ -23,62 +23,52 @@ const bookController = {
         if (conditions.length > 0) {
             sql += ` WHERE ` + conditions.join(` AND `);
         }
-        if (limit){
+        if (limit) {
             sql += ` LIMIT ? `;
             values.push(parseInt(limit));
         }
-        if (offset){
+        if (offset) {
             sql += `OFFSET ?`;
             values.push(parseInt(limit));
         }
         sql += `;`;
 
         let response = {};
-        conn.query(sql, values,
-            (err, results) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
+        try {
+            const [results] = await conn.query(sql, values);
+            response.books = results;
 
-                response.books = results;
-            }
-        );
-        
-        sql = `SELECT count(*) AS total_count FROM books`
-        
-        conn.query(sql,
-            (err, results) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-                let pagination = {};
-                pagination.currentPage = parseInt(currentPage);
-                pagination.totalCount = results[0]["total_count"];
-                response.pagination = pagination;
+            sql = `SELECT count(*) AS total_count FROM books`;
+            const [countResults] = await conn.query(sql);
 
-                return res.status(StatusCodes.OK).json(response);
-            }
-        );
+            let pagination = {};
+            pagination.currentPage = parseInt(currentPage);
+            pagination.totalCount = countResults[0]["total_count"];
+            response.pagination = pagination;
+
+            return res.status(StatusCodes.OK).json(response);
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     },
-    getSingleBook: (req, res) => {
+    getSingleBook: async (req, res) => {
         let booksId = req.params.id;
         const authorization = ensureAuthorization(req);
 
         let sql = `SELECT books.id, books.title, img, category.category_name AS categoryName, isbn, summary, detail, author, pages, contents, price,
                    (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes `;
-        let values=[];
+        let values = [];
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
-        } else if (authorization instanceof ReferenceError){
+        } else if (authorization instanceof ReferenceError) {
 
         } else {
             sql += `, (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked `;
@@ -92,17 +82,14 @@ const bookController = {
                 ON books.category_id = category.category_id
                 WHERE books.id=?;`;
 
-        conn.query(sql, values,
-            (err, results) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(StatusCodes.BAD_REQUEST).end();
-                }
-
-                if (results[0]) return res.status(StatusCodes.OK).json(results[0]);
-                else return res.status(StatusCodes.NOT_FOUND).end();
-            }
-        );
+        try {
+            const [results] = await conn.query(sql, values);
+            if (results[0]) return res.status(StatusCodes.OK).json(results[0]);
+            else return res.status(StatusCodes.NOT_FOUND).end();
+        } catch (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
     }
 }
 

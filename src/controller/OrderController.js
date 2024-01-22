@@ -1,13 +1,10 @@
 const conn = require('../database/mariadb');
-const mariadb = require('mysql2/promise');
 const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
 const ensureAuthorization = require('../midlewares/auth');
 
-
-const deleteCartItems = async (conn, items) => {
+const deleteCartItems = async (items) => {
     let sql = `DELETE FROM cartItems WHERE id IN (?);`;
-
     let [result] = await conn.query(sql, [items]);
     return result;
 }
@@ -27,14 +24,6 @@ const orderController = {
         }
 
         const user_id = authorization.id;
-
-        const conn = await mariadb.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-            database: 'BookShop',
-            dateStrings: true
-        });
 
         const { items, delivery, firstBookTitle, totalQuantity, totalPrice } = req.body;
 
@@ -64,7 +53,7 @@ const orderController = {
             console.log(err);
         }
 
-        let response = await deleteCartItems(conn, items);
+        let response = await deleteCartItems(items);
         return res.status(StatusCodes.OK).json(response);
     },
     getOrders: async (req, res) => {
@@ -80,14 +69,6 @@ const orderController = {
             });
         }
         const user_id = authorization.id;
-
-        const conn = await mariadb.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-            database: 'BookShop',
-            dateStrings: true
-        });
 
         let sql = `select orders.id AS orderId, created_at AS createdAt, address, receiver, contact,
                     book_title AS bookTitle, total_quantity AS totalQuantity, total_Price AS totalPrice
@@ -111,14 +92,6 @@ const orderController = {
         }
 
         const orderId = req.params.id;
-        
-        const conn = await mariadb.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-            database: 'BookShop',
-            dateStrings: true
-        });
 
         let sql = `select book_id AS bookId, title, author, price, quantity
                     from BookShop.orderedBook LEFT JOIN BookShop.books
