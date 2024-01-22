@@ -1,7 +1,7 @@
 const conn = require('../mariadb');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
-const ensureAuthorization = require('../midlewares/auth');
+const ensureAuthorization = require('../src/midlewares/auth');
 
 const likeController = {
     addLike: (req, res) => {
