@@ -32,9 +32,7 @@ const login = async (req, res) => {
 const passwordResetRequest = async (req, res) => {
     try {
         const email = await UserService.passwordResetRequest(req.body.email);
-        if (email) {
-            return res.status(StatusCodes.OK).json({ email });
-        }
+        if (email) return res.status(StatusCodes.OK).json({ email : email });
         return res.status(StatusCodes.UNAUTHORIZED).end();
     } catch (err) {
         console.log(err);
