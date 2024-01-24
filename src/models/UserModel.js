@@ -32,6 +32,7 @@ class User {
         const hashPassword = crypto.pbkdf2Sync(password, this.salt, 10000, 10, 'sha512').toString('base64');
         return this.password === hashPassword;
     }
+
 }
 
 module.exports = User;
