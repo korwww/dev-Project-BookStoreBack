@@ -11,7 +11,7 @@ class User {
 
     static async findByEmail(email) {
         const sql = `SELECT * FROM users WHERE email = ?`;
-        const [results] = await conn.execute(sql, email);
+        const [results] = await conn.execute(sql, [email]);
         return results[0] ? new User(results[0].id, results[0].email, results[0].password, results[0].salt) : null;
     }
 
