@@ -6,7 +6,7 @@ dotenv.config();
 
 class UserService {
     static async join(email, password) {
-        const user = new User(email, password);
+        const user = new User(null, email, password);
         await user.save();
         return user;
     }

@@ -42,7 +42,7 @@ const passwordResetRequest = async (req, res) => {
         return res.status(StatusCodes.UNAUTHORIZED).end();
     } catch (err) {
         console.log(err);
-        
+
         return res.status(StatusCodes.BAD_REQUEST).end();
     }
 };
