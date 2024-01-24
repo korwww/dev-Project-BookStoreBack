@@ -5,7 +5,10 @@ const join = async (req, res) => {
     try {
         const user = await UserService.join(req.body.email, req.body.password);
 
-        if (user) return res.status(StatusCodes.CREATED).json(user);
+        if (user) return res.status(StatusCodes.CREATED).json({
+            email : user.email,
+            message : "회원가입 완료"
+        });
         return res.status(StatusCodes.BAD_REQUEST).end();
     } catch (err) {
         console.log(err);
