@@ -1,7 +1,13 @@
-const {StatusCodes} = require('http-status-codes');
+const conn = require('../database/mariadb');
+const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
 const ensureAuthorization = require('../midlewares/auth');
-const OrderService = require('../services/OrderService');
+
+const deleteCartItems = async (items) => {
+    let sql = `DELETE FROM cartItems WHERE id IN (?);`;
+    let [result] = await conn.query(sql, [items]);
+    return result;
+}
 
 const orderController = {
     order: async (req, res) => {
@@ -17,14 +23,38 @@ const orderController = {
             });
         }
 
-        try {
-            const { items, delivery, firstBookTitle, totalQuantity, totalPrice } = req.body;
-            const { orderId, result } = await OrderService.createOrder(authorization.id, items, delivery, firstBookTitle, totalQuantity, totalPrice);
-            return res.status(StatusCodes.OK).json({orderId, result});
-        } catch (err) {
+        const user_id = authorization.id;
+
+        const { items, delivery, firstBookTitle, totalQuantity, totalPrice } = req.body;
+
+        let sql = `INSERT INTO delivery (address, receiver, contact) VALUES(?, ?, ?);`;
+        let values = [delivery.address, delivery.receiver, delivery.contact];
+        let [results] = await conn.execute(sql, values);
+        let order_id = results.insertId;
+
+        sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id)
+                VALUES(?, ?, ?, ?, ?);`
+        values = [firstBookTitle, totalQuantity, totalPrice, user_id, order_id];
+        await conn.execute(sql, values);
+
+        sql = `SELECT book_id, quantity FROM cartItems WHERE id IN (?)`;
+        let [orderItems, fileds] = await conn.query(sql, [items]);
+
+        sql = `INSERT INTO orderedBook(order_id, book_id, quantity) VALUES ?;`;
+        values = [];
+
+        orderItems.forEach((item) =>
+            values.push([order_id, item.book_id, item.quantity])
+        );
+
+        try{
+            results = await conn.query(sql, [values]);
+        }catch(err){
             console.log(err);
-            return res.status(StatusCodes.BAD_REQUEST).end();
         }
+
+        let response = await deleteCartItems(items);
+        return res.status(StatusCodes.OK).json(response);
     },
     getOrders: async (req, res) => {
         const authorization = ensureAuthorization(req);
@@ -38,14 +68,15 @@ const orderController = {
                 "message" : "잘못된 토큰."
             });
         }
+        const user_id = authorization.id;
 
-        try {
-            const orders = await OrderService.getOrders(authorization.id);
-            return res.status(StatusCodes.OK).json(orders);
-        } catch (err) {
-            console.log(err);
-            return res.status(StatusCodes.BAD_REQUEST).end();
-        }
+        let sql = `select orders.id AS orderId, created_at AS createdAt, address, receiver, contact,
+                    book_title AS bookTitle, total_quantity AS totalQuantity, total_Price AS totalPrice
+                    from BookShop.orders LEFT JOIN BookShop.delivery
+                    on orders.delivery_id = delivery.id
+                    WHERE user_id = ?;`
+        let [rows, fields] = await conn.query(sql, user_id);
+        return res.status(StatusCodes.OK).json(rows);
     },
     getOrderDetail: async (req, res) => {
         const authorization = ensureAuthorization(req);
@@ -60,14 +91,17 @@ const orderController = {
             });
         }
 
-        try {
-            const orderDetail = await OrderService.getOrderDetail(req.params.id);
-            return res.status(StatusCodes.OK).json(orderDetail);
-        } catch (err) {
-            console.log(err);
-            return res.status(StatusCodes.BAD_REQUEST).end();
-        }
+        const orderId = req.params.id;
+
+        let sql = `select book_id AS bookId, title, author, price, quantity
+                    from BookShop.orderedBook LEFT JOIN BookShop.books
+                    on orderedBook.book_id = books.id
+                    WHERE order_id = ?;`
+
+        let [rows, fields] = await conn.query(sql, [orderId]);
+
+        return res.status(StatusCodes.OK).json(rows);
     }
 }
 
-module.exports = orderController;
+module.exports = Object.freeze(orderController);
