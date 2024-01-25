@@ -1,5 +1,7 @@
 const Book = require('../models/BookModel');
 
-class BookService {
-    
+const BookService = {
+    async getBooks() {
+        
+    }
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllBooks, getSingleBook } = require('../controller/BookController');
+const { getAllBooks, getSingleBook } = require('../controllers/BookController');
 const { validateErrorHandler,checkAllowedQueryParams, checkParamsId, checkQueryParams } = require('../midlewares/validation');
 
 const dotenv = require('dotenv');
