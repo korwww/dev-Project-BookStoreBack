@@ -6,7 +6,8 @@ const ensureAuthorization = (req) => {
     try{
         const { authorization: receivedJwt } = req.headers;
 
-        if(receivedJwt) {let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+        if(receivedJwt) {
+            let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
             return decodedJwt;
         }
 

@@ -1,7 +1,7 @@
-const conn = require('../database/mariadb');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
+const LikeService = require('../services/LikeService');
 
 const likeController = {
     addLike: async (req, res) => {
@@ -9,22 +9,20 @@ const likeController = {
 
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
 
         const user_id = authorization.id;
 
-        let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
-        let values = [user_id, book_id];
         try {
-            const [results] = await conn.query(sql, values);
+            const results = await LikeService.addLike(user_id, book_id);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);
@@ -32,15 +30,24 @@ const likeController = {
         }
     },
     removeLike: async (req, res) => {
-        const bookId = req.params.id;
+        const book_id = req.params.id;
 
-        const userId  = ensureAuthorization(req).id;
+        const authorization = ensureAuthorization(req);
 
-        let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
-        
-        let values = [userId, bookId];
+        if (authorization instanceof jwt.TokenExpiredError) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                "message": "로그인 세션 만료. 다시 로그인하세요."
+            });
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                "message": "잘못된 토큰."
+            });
+        }
+
+        const user_id = authorization.id;
+
         try {
-            const [results] = await conn.query(sql, values);
+            const results = await LikeService.removeLike(user_id, book_id);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);

@@ -4,14 +4,13 @@ const User = require('../models/UserModel');
 
 dotenv.config();
 
-class UserService {
-    static async join(email, password) {
+const UserService = {
+    async join(email, password) {
         const user = new User(null, email, password);
         await user.save();
         return user;
-    }
-
-    static async login(email, password) {
+    },
+    async login(email, password) {
         const user = await User.findByEmail(email);
         if (user && user.verifyPassword(password)) {
             const token = jwt.sign({
@@ -24,14 +23,12 @@ class UserService {
             return token;
         }
         return null;
-    }
-
-    static async passwordResetRequest(email) {
+    },
+    async passwordResetRequest(email) {
         const user = await User.findByEmail(email);
         return user ? user.email : null;
-    }
-
-    static async passwordReset(email, password) {
+    },
+    async passwordReset(email, password) {
         const user = await User.findByEmail(email);
         if (user) {
             user.password = password;
@@ -42,4 +39,4 @@ class UserService {
     }
 }
 
-module.exports = UserService;
+module.exports = Object.freeze(UserService);

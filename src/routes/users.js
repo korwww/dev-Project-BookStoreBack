@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { join, login, passwordResetRequest, passwordReset } = require('../controller/UserController');
+const { join, login, passwordResetRequest, passwordReset } = require('../controllers/UserController');
 const { validateErrorHandler, checkBodyEmail, checkBodyPassword } = require('../midlewares/validation');
 const { body, param, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');

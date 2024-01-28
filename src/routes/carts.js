@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addItemsToCart, getCartItems, removeCartItems } = require('../controller/CartController');
+const { addItemsToCart, getCartItems, removeCartItems } = require('../controllers/CartController');
 const { validateErrorHandler, checkBodyCarts, checkBodyArrayItems, checkParamsId } = require('../midlewares/validation');
 
 const dotenv = require('dotenv');

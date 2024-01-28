@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getOrders, order, getOrderDetail } = require('../controller/OrderController');
+const { getOrders, order, getOrderDetail } = require('../controllers/OrderController');
 const { validateErrorHandler, checkParamsId, checkBodyArrayItems, checkBodyOrders} = require('../midlewares/validation');
 
 const dotenv = require('dotenv');
