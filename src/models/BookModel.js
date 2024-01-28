@@ -1,72 +1,77 @@
 const conn = require('../database/mariadb');
 
 class Book {
-    // constructor(sql, bookState){
-    //     this.sql = sql;
-    //     this.bookState = bookState || 
-    //     {
-            
-    //     };
-    // }
+    constructor(categoryId, isNew, limit, currentPage) {
+        this.categoryId = categoryId;
+        this.isNew = isNew;
+        this.limit = limit;
+        this.currentPage = currentPage;
+    }
 
-    // checkCategoryId(categoryId, values, conditions) {
-    //     if (categoryId) {
-    //         conditions.push(`category_id = ?`);
-    //         values.push(categoryId);
-    //     }
-    // }
+    checkCategoryId(values, conditions) {
+        if (this.categoryId) {
+            conditions.push(`category_id = ?`);
+            values.push(this.categoryId);
+        }
+    }
 
-    // checkIsNew(isNew, conditions) {
-    //     if (String(isNew).toLowerCase() === "true") {
-    //         conditions.push(`pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`);
-    //     }
-    // }
+    checkIsNew(conditions) {
+        if (String(this.isNew).toLowerCase() === "true") {
+            conditions.push(`pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`);
+        }
+    }
 
-    // addWhereQuery(conditions){
-    //     if (conditions.length > 0) {
-    //         return ` WHERE ` + conditions.join(` AND `);
-    //     }
-    //     return '';
-    // }
+    addWhereQuery(conditions) {
+        if (conditions.length > 0) {
+            return ` WHERE ` + conditions.join(` AND `);
+        }
+        return '';
+    }
 
-    // checkLimit(limit, values) {
-    //     if (limit) {
-    //         values.push(parseInt(limit));
-    //         return ` LIMIT ? `;
-    //     }
-    // }
+    checkLimit(values) {
+        if (this.limit) {
+            values.push(parseInt(this.limit));
+            return ` LIMIT ?`;
+        }
+        return '';
+    }
 
-    // checkOffset(offset, values) {
-    //     if (offset) {
-    //         values.push(parseInt(limit));
-    //         return `OFFSET ?`;
-    //     }
-    // }
+    checkCurrentPage(values) {
+        if (this.limit * (this.currentPage - 1)) {
+            values.push(parseInt(this.limit));
+            return ` OFFSET ?`;
+        }
+        return '';
+    }
 
-    // async getBooks () {
-    //     const { categoryId, isNew, limit, currentPage = 1 } = req.query;
+    async findBooksByQuery() {
+        let sql = `
+                    SELECT id, title, img, summary, author, price, (SELECT count(*) 
+                    FROM likes WHERE books.id = liked_book_id) AS likes, pub_date AS pubDate 
+                    FROM books`;
+        let values = [];
+        let conditions = [];
 
+        this.checkCategoryId(values, conditions);
 
-    //     let sql = `SELECT id, title, img, summary, author, price, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes, pub_date AS pubDate FROM books`;
-    //     let values = [];
-    //     let conditions = [];
+        this.checkIsNew(values, conditions);
 
-    //     checkCategoryId(categoryId, values, conditions);
+        sql += this.addWhereQuery(conditions);
 
-    //     isNew(isNew, values, conditions);
+        sql += this.checkLimit(values);
 
-    //     sql += this.addWhereQuery(conditions);
+        sql += this.checkCurrentPage(values);
 
-    //     sql += checkLimit(limit, values);
+        sql += `;`;
 
-    //     let offset = limit * (currentPage - 1);
-    //     sql += checkOffset(offset, values);
+        return await conn.execute(sql, values);
+    }
 
-    //     sql += `;`;
+    static async getTotalCount() {
+        let sql = `SELECT count(*) AS total_count FROM books`;
 
-    //     return await conn.query(sql, values);
-    // }
-
+        return await conn.execute(sql);
+    }
 }
 
 module.exports = Book;

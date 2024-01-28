@@ -6,48 +6,15 @@ const ensureAuthorization = require('../midlewares/auth');
 const { StatusCodes } = require('http-status-codes');
 const BookService = require('../services/BookService');
 
-const bookController = {
+const BookController = {
     getAllBooks: async (req, res) => {
         const { categoryId, isNew, limit, currentPage = 1 } = req.query;
 
-        let offset = limit * (currentPage - 1);
-
-        let sql = `SELECT id, title, img, summary, author, price, (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes, pub_date AS pubDate FROM books`;
-        let values = [];
-        let conditions = [];
-
-        if (categoryId) {
-            conditions.push(`category_id = ?`);
-            values.push(categoryId);
-        }
-        if (String(isNew).toLowerCase() === "true") {
-            conditions.push(`pub_date BETWEEN DATE_SUB(NOW(), INTERVAL 1 MONTH) AND NOW()`);
-        }
-        if (conditions.length > 0) {
-            sql += ` WHERE ` + conditions.join(` AND `);
-        }
-        if (limit) {
-            sql += ` LIMIT ? `;
-            values.push(parseInt(limit));
-        }
-        if (offset) {
-            sql += `OFFSET ?`;
-            values.push(parseInt(limit));
-        }
-        sql += `;`;
-
         let response = {};
         try {
-            const [results] = await conn.query(sql, values);
-            response.books = results;
+            response.books = await BookService.getBooks(categoryId, isNew, limit, currentPage);
 
-            sql = `SELECT count(*) AS total_count FROM books`;
-            const [countResults] = await conn.query(sql);
-
-            let pagination = {};
-            pagination.currentPage = parseInt(currentPage);
-            pagination.totalCount = countResults[0]["total_count"];
-            response.pagination = pagination;
+            response.pagination = await BookService.createPagination(currentPage);
 
             return res.status(StatusCodes.OK).json(response);
         } catch (err) {
@@ -96,4 +63,4 @@ const bookController = {
     }
 }
 
-module.exports = Object.freeze(bookController);
+module.exports = Object.freeze(BookController);
