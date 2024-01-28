@@ -5,6 +5,10 @@ const CartService = {
         const cart = new Cart(book_id, quantity, user_id);
         const [results] = await cart.save();
         return results;
+    },
+    async getItems(user_id, selected){
+        const [results] = await Cart.getcartItems(user_id, selected);
+        return results;
     }
 }
 

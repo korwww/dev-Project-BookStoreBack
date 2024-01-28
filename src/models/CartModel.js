@@ -13,6 +13,28 @@ class Cart {
 
         return await conn.execute(sql, values);
     }
+
+    static checkSelected(selected, values){
+        if(selected){
+            values.push(selected);
+            return ` AND c.id IN (?)`;
+        }
+        return '';
+    }
+
+    static async getcartItems(user_id, selected){
+        let sql = `SELECT c.id, book_id AS bookId, title, summary, quantity, price
+        FROM cartItems c LEFT JOIN books b
+        ON c.book_id=b.id
+        WHERE user_id = ?`
+
+        let values = [user_id];
+
+        sql += this.checkSelected(selected, values);
+        sql += `;`;
+        
+        return await conn.execute(sql, values);
+    }
 }
 
 module.exports = Cart;

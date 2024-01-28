@@ -21,7 +21,7 @@ const cartController = {
         const { book_id, quantity } = req.body;
 
         try {
-            const results = CartService.insertItems(book_id, quantity, user_id);
+            const results = await CartService.insertItems(book_id, quantity, user_id);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);
@@ -44,21 +44,9 @@ const cartController = {
         const user_id = authorization.id;
         
         const { selected } = req.body;
-      
-        let sql = `SELECT c.id, book_id AS bookId, title, summary, quantity, price
-        FROM cartItems c LEFT JOIN books b
-        ON c.book_id=b.id
-        WHERE user_id = ?`
-
-        let values = [user_id];
-        if(selected){
-            sql += ` AND c.id IN (?)`;
-            values.push(selected);
-        }
-        sql += `;`;
 
         try {
-            const [results] = await conn.query(sql, values);
+            const results = await CartService.getItems(user_id, selected);
             return res.status(StatusCodes.OK).json(results);
         } catch (err) {
             console.log(err);
