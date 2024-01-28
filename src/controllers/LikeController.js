@@ -1,7 +1,7 @@
-const conn = require('../database/mariadb');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
+const LikeService = require('../services/LikeService');
 
 const likeController = {
     addLike: async (req, res) => {
@@ -21,10 +21,8 @@ const likeController = {
 
         const user_id = authorization.id;
 
-        let sql = `INSERT INTO likes(user_id, liked_book_id) VALUES (?, ?);`;
-        let values = [user_id, book_id];
         try {
-            const [results] = await conn.query(sql, values);
+            const results = await LikeService.addLike(user_id, book_id);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);

@@ -1,6 +1,4 @@
 const jwt = require('jsonwebtoken');
-
-
 const ensureAuthorization = require('../midlewares/auth');
 const { StatusCodes } = require('http-status-codes');
 const BookService = require('../services/BookService');

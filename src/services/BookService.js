@@ -16,7 +16,7 @@ const BookService = {
 
         return pagination;
     },
-    async getBookById(bookId){
+    async getBookById(bookId) {
         const [results] = await Book.findBooksById(bookId);
         return results[0];
     }
