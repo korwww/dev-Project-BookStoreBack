@@ -3,7 +3,7 @@ const Book = require('../models/BookModel');
 const BookService = {
     async getBooks(categoryId, isNew, limit, currentPage) {
         const bookList = new Book(categoryId, isNew, limit, currentPage);
-        [results] = await bookList.findBooksByQuery();
+        const [results] = await bookList.findBooksByQuery();
 
         return results;
     },

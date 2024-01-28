@@ -1,7 +1,7 @@
-const conn = require('../database/mariadb');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 const ensureAuthorization = require('../midlewares/auth');
+const CartService = require('../services/CartService');
 
 const cartController = {
     addItemsToCart: async (req, res) => {
@@ -20,11 +20,8 @@ const cartController = {
 
         const { book_id, quantity } = req.body;
 
-        let sql = `INSERT INTO cartItems (book_id, quantity, user_id) VALUES (?, ?, ?);`;
-        let values = [book_id, quantity, user_id];
-
         try {
-            const [results] = await conn.query(sql, values);
+            const results = CartService.insertItems(book_id, quantity, user_id);
             return res.status(StatusCodes.CREATED).json(results);
         } catch (err) {
             console.log(err);
