@@ -23,32 +23,40 @@ class Order {
     }
 
     async save() {
-        let sql = `INSERT INTO delivery (address, receiver, contact) VALUES(?, ?, ?);`;
-        let values = [this.delivery.address, this.delivery.receiver, this.delivery.contact];
-        let [results] = await conn.execute(sql, values);
-        let orderId = results.insertId;
-        
-        sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id) VALUES(?, ?, ?, ?, ?);`
-        values = [this.firstBookTitle, this.totalQuantity, this.totalPrice, this.userId, orderId];
-        await conn.execute(sql, values);
-
-        sql = `SELECT book_id, quantity FROM cartItems WHERE id IN (?)`;
-        let [orderItems] = await conn.query(sql, [this.items]);
-
-        sql = `INSERT INTO orderedBook(order_id, book_id, quantity) VALUES ?;`;
-        values = [];
-
-        orderItems.forEach((item) =>
-            values.push([orderId, item.book_id, item.quantity])
-        );
- 
+        const conn = await pool.getConnection();
         try {
-            results = await conn.query(sql, [values]);
-        } catch (err) {
-            console.log(err);
-        }
+            await conn.beginTransaction();
 
-        return orderId;
+            let sql = `INSERT INTO delivery (address, receiver, contact) VALUES(?, ?, ?);`;
+            let values = [this.delivery.address, this.delivery.receiver, this.delivery.contact];
+            let [results] = await conn.execute(sql, values);
+            let orderId = results.insertId;
+
+            sql = `INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id) VALUES(?, ?, ?, ?, ?);`
+            values = [this.firstBookTitle, this.totalQuantity, this.totalPrice, this.userId, orderId];
+            await conn.execute(sql, values);
+
+            sql = `SELECT book_id, quantity FROM cartItems WHERE id IN (?)`;
+            let [orderItems] = await conn.execute(sql, [this.items]);
+
+            sql = `INSERT INTO orderedBook(order_id, book_id, quantity) VALUES ?;`;
+            values = [];
+
+            orderItems.forEach((item) =>
+                values.push([orderId, item.book_id, item.quantity])
+            );
+
+            await conn.execute(sql, [values]);
+
+            await conn.commit();
+
+            return orderId;
+        } catch (error) {
+            await conn.rollback();
+            throw error;
+        } finally {
+            conn.release();
+        }
     }
 
     async deleteCartItems() {
