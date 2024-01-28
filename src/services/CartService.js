@@ -9,6 +9,10 @@ const CartService = {
     async getItems(user_id, selected){
         const [results] = await Cart.getcartItems(user_id, selected);
         return results;
+    },
+    async removeCartItems(cartItemId){
+        const [results] = await Cart.delete(cartItemId);
+        return results;
     }
 }
 

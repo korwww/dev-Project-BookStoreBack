@@ -68,9 +68,8 @@ const cartController = {
 
         const cartItemId = req.params.id;
         
-        let sql = `DELETE FROM cartItems WHERE id = ?;`;
         try {
-            const [results] = await conn.query(sql, cartItemId);
+            const results = await CartService.removeCartItems(cartItemId);
             return res.status(StatusCodes.OK).json(results);
         } catch (err) {
             console.log(err);

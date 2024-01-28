@@ -35,6 +35,11 @@ class Cart {
         
         return await conn.execute(sql, values);
     }
+
+    static async delete(cartItemId){
+        let sql = `DELETE FROM cartItems WHERE id = ?;`;
+        return await conn.execute(sql, [cartItemId]);
+    }
 }
 
 module.exports = Cart;
