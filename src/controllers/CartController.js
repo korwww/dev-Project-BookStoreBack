@@ -7,13 +7,13 @@ const cartController = {
     addItemsToCart: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
         const user_id = authorization.id;
@@ -31,18 +31,18 @@ const cartController = {
     getCartItems: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
         }
-        if (authorization instanceof jwt.JsonWebTokenError){
+        if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
         const user_id = authorization.id;
-        
+
         const { selected } = req.body;
 
         try {
@@ -56,18 +56,18 @@ const cartController = {
     removeCartItems: async (req, res) => {
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
 
         const cartItemId = req.params.id;
-        
+
         try {
             const results = await CartService.removeCartItems(cartItemId);
             return res.status(StatusCodes.OK).json(results);

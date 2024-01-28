@@ -9,13 +9,13 @@ const likeController = {
 
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
 
@@ -34,13 +34,13 @@ const likeController = {
 
         const authorization = ensureAuthorization(req);
 
-        if(authorization instanceof jwt.TokenExpiredError){
+        if (authorization instanceof jwt.TokenExpiredError) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message" : "로그인 세션 만료. 다시 로그인하세요."
+                "message": "로그인 세션 만료. 다시 로그인하세요."
             });
-        } else if (authorization instanceof jwt.JsonWebTokenError){
+        } else if (authorization instanceof jwt.JsonWebTokenError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                "message" : "잘못된 토큰."
+                "message": "잘못된 토큰."
             });
         }
 
