@@ -72,6 +72,35 @@ class Book {
 
         return await conn.execute(sql);
     }
+
+    static async findBooksById(bookId){
+        let sql = `SELECT books.id, books.title, img, category.category_name AS categoryName, isbn, summary, detail, author, pages, contents, price,
+                   (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes `;
+        let values = [];
+
+        // if (authorization instanceof jwt.TokenExpiredError) {
+        //     return res.status(StatusCodes.UNAUTHORIZED).json({
+        //         "message": "로그인 세션 만료. 다시 로그인하세요."
+        //     });
+        // } else if (authorization instanceof jwt.JsonWebTokenError) {
+        //     return res.status(StatusCodes.BAD_REQUEST).json({
+        //         "message": "잘못된 토큰."
+        //     });
+        // } else if (authorization instanceof ReferenceError) {
+
+        // } else {
+        //     sql += `, (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked `;
+        //     values.push(authorization.id, bookId);
+        // }
+        values.push(bookId);
+
+        sql += `, pub_date AS pubDate
+                FROM books
+                LEFT JOIN category
+                ON books.category_id = category.category_id
+                WHERE books.id=?;`;
+        return await conn.execute(sql, values);
+    }
 }
 
 module.exports = Book;

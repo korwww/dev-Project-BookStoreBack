@@ -15,6 +15,10 @@ const BookService = {
         pagination.totalCount = countResults[0]["total_count"];
 
         return pagination;
+    },
+    async getBookById(bookId){
+        const [results] = await Book.findBooksById(bookId);
+        return results[0];
     }
 }
 
