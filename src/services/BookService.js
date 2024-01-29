@@ -16,8 +16,8 @@ const BookService = {
 
         return pagination;
     },
-    async getBookById(bookId) {
-        const [results] = await Book.findBooksById(bookId);
+    async getBookById(bookId, isLogin, userId) {
+        const [results] = await Book.findBooksById(bookId, isLogin, userId);
         return results[0];
     }
 }

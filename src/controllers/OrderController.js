@@ -1,25 +1,20 @@
 const { StatusCodes } = require('http-status-codes');
-const jwt = require('jsonwebtoken');
-const ensureAuthorization = require('../midlewares/auth');
+const {ensureAuthorization, handleAuthError} = require('../midlewares/auth');
 const OrderService = require('../services/OrderService');
 
 const orderController = {
     order: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
-        } else if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
+        let user_id;
+        try {
+            const authorization = ensureAuthorization(req);
+            user_id = authorization.id;
+        } catch (err) {
+            return handleAuthError(res, err);
         }
 
         try {
             const { items, delivery, firstBookTitle, totalQuantity, totalPrice } = req.body;
-            const { orderId, result } = await OrderService.createOrder(authorization.id, items, delivery, firstBookTitle, totalQuantity, totalPrice);
+            const { orderId, result } = await OrderService.createOrder(user_id, items, delivery, firstBookTitle, totalQuantity, totalPrice);
             return res.status(StatusCodes.OK).json({ orderId, result });
         } catch (err) {
             console.log(err);
@@ -27,20 +22,16 @@ const orderController = {
         }
     },
     getOrders: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
-        } else if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
+        let user_id;
+        try {
+            const authorization = ensureAuthorization(req);
+            user_id = authorization.id;
+        } catch (err) {
+            return handleAuthError(res, err);
         }
 
         try {
-            const orders = await OrderService.getOrders(authorization.id);
+            const orders = await OrderService.getOrders(user_id);
             return res.status(StatusCodes.OK).json(orders);
         } catch (err) {
             console.log(err);
@@ -48,18 +39,11 @@ const orderController = {
         }
     },
     getOrderDetail: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
-        } else if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
+        try {
+            ensureAuthorization(req);
+        } catch (err) {
+            return handleAuthError(res, err);
         }
-
         try {
             const orderDetail = await OrderService.getOrderDetail(req.params.id);
             return res.status(StatusCodes.OK).json(orderDetail);
