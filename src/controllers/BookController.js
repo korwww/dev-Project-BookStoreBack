@@ -1,5 +1,4 @@
-const jwt = require('jsonwebtoken');
-const ensureAuthorization = require('../midlewares/auth');
+const {ensureAuthorization, handleAuthError} = require('../midlewares/auth');
 const { StatusCodes } = require('http-status-codes');
 const BookService = require('../services/BookService');
 
@@ -21,9 +20,20 @@ const BookController = {
     },
     getSingleBook: async (req, res) => {
         let bookId = req.params.id;
-        //const authorization = ensureAuthorization(req);
+        let isLogin = false;
+        let user_id;
         try {
-            let results = await BookService.getBookById(bookId);
+            const authorization = ensureAuthorization(req);
+            user_id = authorization.id;
+            isLogin = true;
+        } catch (err) {
+            if (!(err instanceof ReferenceError)) {
+                return handleAuthError(res, err);
+            }
+        }
+    
+        try {
+            let results = await BookService.getBookById(bookId, isLogin, user_id);
             if (results) return res.status(StatusCodes.OK).json(results);
             else return res.status(StatusCodes.NOT_FOUND).end();
         } catch (err) {

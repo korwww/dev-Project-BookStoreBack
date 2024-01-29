@@ -1,22 +1,16 @@
-const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
-const ensureAuthorization = require('../midlewares/auth');
+const {ensureAuthorization, authErrorHandler} = require('../midlewares/auth');
 const CartService = require('../services/CartService');
 
 const cartController = {
     addItemsToCart: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
-        } else if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
+        let user_id;
+        try {
+            const authorization = ensureAuthorization(req);
+            user_id = authorization.id;
+        } catch (err) {
+            return handleAuthError(res, err);
         }
-        const user_id = authorization.id;
 
         const { book_id, quantity } = req.body;
 
@@ -29,19 +23,13 @@ const cartController = {
         }
     },
     getCartItems: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
+        let user_id;
+        try {
+            const authorization = ensureAuthorization(req);
+            user_id = authorization.id;
+        } catch (err) {
+            return handleAuthError(res, err);
         }
-        if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
-        }
-        const user_id = authorization.id;
 
         const { selected } = req.body;
 
@@ -54,16 +42,10 @@ const cartController = {
         }
     },
     removeCartItems: async (req, res) => {
-        const authorization = ensureAuthorization(req);
-
-        if (authorization instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                "message": "로그인 세션 만료. 다시 로그인하세요."
-            });
-        } else if (authorization instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                "message": "잘못된 토큰."
-            });
+        try {
+            ensureAuthorization(req);
+        } catch (err) {
+            return handleAuthError(res, err);
         }
 
         const cartItemId = req.params.id;
